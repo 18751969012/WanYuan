@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <Button android:id="@+id/postion_change_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="更改货柜"/>
+    <TextView
+        android:id="@+id/position_now_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="左柜"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第一层"/>
+        <Button
+            android:id="@+id/one_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="窄履带"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第二层"/>
+        <Button
+            android:id="@+id/two_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="窄履带"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第三层"/>
+        <Button
+            android:id="@+id/three_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="窄履带"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第四层"/>
+        <Button
+            android:id="@+id/four_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="窄履带"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第五层"/>
+        <Button
+            android:id="@+id/five_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="窄履带"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第六层"/>
+        <Button
+            android:id="@+id/six_floor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="窄履带"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/save_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="保存"/>
+    <Button
+        android:id="@+id/query_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查询"/>
+</LinearLayout>
+
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/position_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+</LinearLayout>

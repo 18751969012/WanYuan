@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="4"
+    android:orientation="horizontal"
+    android:weightSum="8">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/fast_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="快速上升" />
+
+        <Button
+            android:id="@+id/slow_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="慢速上升" />
+
+        <Button
+            android:id="@+id/fast_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="快速下降" />
+
+        <Button
+            android:id="@+id/slow_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="慢速下降" />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="停       止" />
+
+        <TextView
+            android:id="@+id/the_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:text="当前格位" />
+
+        <Button
+            android:id="@+id/confirm_this"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确认格位" />
+
+        <EditText
+            android:id="@+id/manuel_floor_no"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="0" />
+
+        <Button
+            android:id="@+id/manuel_confirm_floor_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="手动输入位置" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/change_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="更改货柜" />
+
+        <TextView
+            android:id="@+id/now_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前为左货柜" />
+
+        <EditText
+            android:id="@+id/floor_no"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="0" />
+
+        <Button
+            android:id="@+id/confirm_floor_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确认层数" />
+
+        <TextView
+            android:id="@+id/floor_msg"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <Button
+            android:id="@+id/delete_last"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除最后一个" />
+
+        <Button
+            android:id="@+id/delete_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="清空" />
+
+        <Button
+            android:id="@+id/confirm_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确认保存" />
+        <Button
+            android:id="@+id/test_activity_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="进入测试界面"/>
+        <Button
+            android:id="@+id/position_activity_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="进入位置设置界面"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/y_motor_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Y电机信息" />
+
+
+
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/test_change_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="更改货柜" />
+
+        <TextView
+            android:id="@+id/test_now_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前为左货柜" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试" />
+
+        <EditText
+            android:id="@+id/row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="行" />
+
+        <EditText
+            android:id="@+id/column"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="列" />
+
+        <Button
+            android:id="@+id/houdao_motor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="货道电机" />
+
+        <TextView
+            android:id="@+id/huodao_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="货道电机信息" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/open_get_door"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开取货门" />
+
+        <Button
+            android:id="@+id/close_get_door"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关取货门" />
+
+        <TextView
+            android:id="@+id/quhuo_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取货门电机信息" />
+
+        <Button
+            android:id="@+id/open_out_door"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开出货门" />
+
+        <Button
+            android:id="@+id/close_out_door"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关出货门" />
+
+        <TextView
+            android:id="@+id/chuhuo_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="出货门电机信息" />
+
+        <Button
+            android:id="@+id/open_fall_door"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开落货门" />
+
+        <Button
+            android:id="@+id/close_fall_door"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关落货门" />
+
+        <TextView
+            android:id="@+id/luohuo_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="落货门电机信息" />
+
+        <Button
+            android:id="@+id/x_motor_zhen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="履带正转" />
+
+        <Button
+            android:id="@+id/x_motor_fan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="履带反转" />
+
+        <TextView
+            android:id="@+id/x_motor_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="履带电机信息" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/open_center_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开电磁锁" />
+
+        <Button
+            android:id="@+id/open_side_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开边柜灯" />
+
+        <Button
+            android:id="@+id/close_side_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关边柜灯" />
+
+        <Button
+            android:id="@+id/open_center_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开中柜灯" />
+
+        <Button
+            android:id="@+id/close_center_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关中柜灯" />
+
+        <Button
+            android:id="@+id/open_door_heat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开门加热" />
+
+        <Button
+            android:id="@+id/close_door_heat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关门加热" />
+
+    </LinearLayout>
+</LinearLayout>

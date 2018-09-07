@@ -79,6 +79,7 @@ public class MyOpenHelper extends SQLiteOpenHelper {
 
         String Transaction_table = "create table TransactionInfo(" +
                 "_id integer primary key autoincrement," +
+                "orderNO nvarchar(100)," +
                 "complete integer," +
                 "type integer," +
                 "beginTime datetime default CURRENT_TIMESTAMP," +

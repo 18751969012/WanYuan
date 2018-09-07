@@ -95,7 +95,7 @@ public class ReceiveThread extends Thread {
     public ReceiveThread(Context context){
         super();
         this.context = context;
-        serialPort485 = new SerialPort(1, 38400, 8, 'n', 1);
+        serialPort485 = new SerialPort(5, 38400, 8, 'n', 1);
         mMotorControl = new MotorControl(serialPort485,context);
     }
 

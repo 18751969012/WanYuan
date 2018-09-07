@@ -39,9 +39,9 @@ const char *devname[] = {
         "/dev/ttyS2",
         "/dev/ttyS3",
         "/dev/ttyS4",
-        "/dev/ttyUSB0",
-        "/dev/ttyUSB1",
-        "/dev/ttyUSB2",
+        "/dev/ttyO2",
+        "/dev/ttyO3",
+        "/dev/ttyO4",
         "/dev/ttyAMA2",
         "/dev/ttyAMA0"
 };

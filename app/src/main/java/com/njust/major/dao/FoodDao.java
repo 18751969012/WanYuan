@@ -18,7 +18,7 @@ public interface FoodDao {
 
     public void updatePositionIDStock(int counter, int positionID);//指定货道库存减1，如果没有减完没有货了，则关闭本货道物品的state
 
-    public Foodstuff query(int counter, int positionID);
+    public Foodstuff query(int positionID);
 
     public List<Foodstuff> queryAll();
 

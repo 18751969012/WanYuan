@@ -78,7 +78,7 @@ public class SendThread extends Thread {
         queryLastedTransaction = tDao.queryLastedTransaction();
         Log.w("happy", queryLastedTransaction.toString());
         String [] str = queryLastedTransaction.getFoodIDs().split(" ");
-        Log.w("happy", String.valueOf(str));
+        Log.w("happy", Arrays.toString(str));
         int[] foodIDs = new int[str.length];
         List<Integer> counterSet1 = new ArrayList<Integer>();//存储counter1要取的货的positionID
         List<Integer> counterSet2 = new ArrayList<Integer>();//存储counter2要取的货的positionID
@@ -86,10 +86,13 @@ public class SendThread extends Thread {
             foodIDs[i] = Integer.parseInt(str[i]);
         }
         Arrays.sort(foodIDs);
+        Log.w("happy", ""+ Arrays.toString(foodIDs));
         /*根据购物清单，随机查找还有库存并且可以交易的商品，分成左右柜两个列表存储起来*/
         for (int foodID : foodIDs){
             List<Foodstuff> foodstuffList = fDao.queryByFoodID(foodID);
+            Log.w("happy", "93"+ foodstuffList);
             for (Foodstuff foodstuff : foodstuffList){
+                Log.w("happy", "95"+ foodstuff.toString());
                 if (foodstuff.getStock() != 0 && foodstuff.getState() == 1){
                     if (foodstuff.getCounter() == 1){
                         counterSet1.add(foodstuff.getPositionID());
@@ -103,7 +106,8 @@ public class SendThread extends Thread {
                 }
             }
         }
-
+        Log.w("happy", ""+ counterSet1);
+        Log.w("happy", ""+ counterSet2);
         int[] counter1 = new int[counterSet1.size()];
         int[] counter2 = new int[counterSet2.size()];
         int tmp = 0;
@@ -120,7 +124,8 @@ public class SendThread extends Thread {
         //每三件一个包
         packageCount1 = (counterSet1.size() % 3 == 0 ? (counterSet1.size() / 3): (counterSet1.size() / 3 + 1));
         packageCount2 = (counterSet2.size() % 3 == 0 ? (counterSet2.size() / 3): (counterSet2.size() / 3 + 1));
-
+        Log.w("happy", ""+ Arrays.toString(counter1));
+        Log.w("happy", ""+ Arrays.toString(counter2));
         mR.outGoods1 = calculateOrientationTime(1, counter1,packageCount1);
         mR2.outGoods2 = calculateOrientationTime(2, counter2,packageCount2);
 
@@ -305,8 +310,8 @@ public class SendThread extends Thread {
                     Log.w("happy", "中柜 取货");
                     Util.WriteFile("中柜 取货");
                     mMotorControl.getGoods(midZhenNumber);
-                    mR.getGoodsFlag = false;
                     mR2.getGoodsFlag = false;
+                    mR.getGoodsFlag = false;
                     mR.midPhases = 1;mR.midOneSecFlag = true;mR.midTimeNumber = 0;//告诉定时器运行阶段，开启定时重发的标志位，定时器计数置零
             }
             if(mR.closeDoorFlag){

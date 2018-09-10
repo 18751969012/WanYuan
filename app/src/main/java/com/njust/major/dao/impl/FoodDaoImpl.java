@@ -77,11 +77,11 @@ public class FoodDaoImpl implements FoodDao {
 
     @Override
     public void updatePositionIDStock(int counter, int positionID) {
-        Foodstuff bean = query(counter, positionID);
+        Foodstuff bean = query(positionID);
         int stock = bean.getStock();
-        int state = 0;
+        int state = 1;
         if (stock <= 1) {
-            state = 1;
+            state = 0;
         }
         Uri uri = Uri.parse("content://com.njust/Fupdate");
         ContentValues values = new ContentValues();
@@ -93,17 +93,18 @@ public class FoodDaoImpl implements FoodDao {
     }
 
     @Override
-    public Foodstuff query(int counter, int positionID) {
+    public Foodstuff query(int positionID) {
         Foodstuff bean = null;
         Uri uri = Uri.parse("content://com.njust/Fquery");
-        String[] Args = new String[]{"" + positionID, "" + counter};
+        String[] Args = new String[]{"" + positionID};
         Cursor cursor = context.getContentResolver().query(uri, null,
-                "positionID=? and counter=?", Args, null);
+                "positionID=?", Args, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToNext();
             int _id = cursor.getInt(0);
             int foodID = cursor.getInt(1);
             int stock = cursor.getInt(3);
+            int counter = cursor.getInt(4);
             int state = cursor.getInt(5);
             int price = cursor.getInt(6);
             bean = new Foodstuff(_id, foodID, positionID, stock, counter, state, price);

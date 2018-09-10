@@ -39,10 +39,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
     private final static String LEFTCOUNTER = "当前为左柜";
     private final static String RIGHTCOUNTER = "当前为右柜";
-    private boolean serialFlag = true; //true为左 false为右
     private SerialPort serialPort;
-    private final SerialPort mSerialPort1 = new SerialPort(1, 38400, 8, 'n', 1);
-    private final SerialPort mSerialPort2 = new SerialPort(4, 38400, 8, 'n', 1);
+    private final SerialPort mSerialPort = new SerialPort(1, 38400, 8, 'n', 1);
     private MotorControl motorControl;
     private int counter = 1;
     private Context mContext;
@@ -96,7 +94,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         confirmAll.setOnClickListener(this);
         manuelConfirm.setOnClickListener(this);
         getInTestActivty.setOnClickListener(this);
-        serialPort = mSerialPort1;
+        serialPort = mSerialPort;
         settingReceiveThread = new SettingReceiveThread(serialPort);
         motorControl = new MotorControl(serialPort, mContext);
         settingReceiveThread.sendFlag = true;
@@ -184,14 +182,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void changeCounter() {
-        if (serialFlag){
-            serialPort = mSerialPort2;
-        }else {
-            serialPort = mSerialPort1;
-        }
         settingReceiveThread.setPort(serialPort);
-        motorControl.changPort(serialPort);
-        serialFlag = !serialFlag;
         counter = counter == 1 ? 2 : 1;
         if (counter == 1) {
             mNowCounter.setText(LEFTCOUNTER);

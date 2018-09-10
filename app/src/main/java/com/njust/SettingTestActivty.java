@@ -26,10 +26,8 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
 
     private SettingTestThread settingTestThread;
     private MotorControl motorControl;
-    private boolean serialFlag = true; //true为左 false为右
     private SerialPort serialPort;
-    private final SerialPort mSerialPort1 = new SerialPort(1, 38400, 8, 'n', 1);
-    private final SerialPort mSerialPort2 = new SerialPort(4, 38400, 8, 'n', 1);
+    private final SerialPort mSerialPort = new SerialPort(1, 38400, 8, 'n', 1);
     private int counter = 1;
     private TextView mNowCounter;
     private byte zhen = 0;
@@ -118,7 +116,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         openDoorHeat.setOnClickListener(this);
         closeDoorHeat.setOnClickListener(this);
         mHoudao.setOnClickListener(this);
-        serialPort = mSerialPort1;
+        serialPort = mSerialPort;
         motorControl = new MotorControl(serialPort, getApplicationContext());
         settingTestThread = new SettingTestThread();
         settingTestThread.init(serialPort);
@@ -196,14 +194,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
 
 
     public void changeCounter() {
-        if (serialFlag){
-            serialPort = mSerialPort2;
-        }else {
-            serialPort = mSerialPort1;
-        }
         settingTestThread.setPort(serialPort);
-        motorControl.changPort(serialPort);
-        serialFlag = !serialFlag;
         counter = counter == 1 ? 2 : 1;
         if (counter == 1) {
             mNowCounter.setText(LEFTCOUNTER);

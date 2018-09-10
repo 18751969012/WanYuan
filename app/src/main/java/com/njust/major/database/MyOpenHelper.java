@@ -144,12 +144,12 @@ public class MyOpenHelper extends SQLiteOpenHelper {
 
 
 
-        for (int i = 1; i <= 60; i++ ){
+        for (int i = 1; i <= 100; i++ ){
             String sql = "insert into FoodInfo(foodID,positionID,stock,counter,state,price) values ("
                     +i +","+i+","+"100,1,1,1)";
             db.execSQL(sql);
             String sql1 = "insert into FoodInfo(foodID,positionID,stock,counter,state,price) values ("
-                    +(i+60) +","+i+","+"100,2,1,1)";
+                    +(i+100) +","+(i+100)+","+"100,2,1,1)";
             db.execSQL(sql1);
         }
 

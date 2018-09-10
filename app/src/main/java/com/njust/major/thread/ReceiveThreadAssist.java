@@ -6,6 +6,8 @@ import android.util.Log;
 import com.njust.SerialPort;
 import com.njust.major.SCM.MotorControl;
 import com.njust.major.util.Util;
+
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.njust.major.error.errorHandling;
@@ -64,13 +66,14 @@ public class ReceiveThreadAssist extends Thread {
     boolean rightOneSecFlag = false;
     boolean rightTimerErrorFlag = false;
     private int rightReMissionTime = 0;
+    private byte[] rec;
 
 
 
     public ReceiveThreadAssist(Context context){
         super();
         this.context = context;
-        serialPort232 = new SerialPort(4, 38400, 8, 'n', 1);
+        serialPort232 = new SerialPort(3, 19200, 8, 'n', 1);
         mMotorControl = new MotorControl(serialPort232,context);
     }
 
@@ -101,18 +104,50 @@ public class ReceiveThreadAssist extends Thread {
         super.run();
         while(ReceiveThreadFlag){
             int onceRecNumber = 1;
-            byte[] rec = serialPort232.receiveData();
-            if(rec != null && rec.length >= 5) {
-                if (rec[0] != (byte) 0xE2 || rec[rec.length - 2] != (byte) 0xF1) {
-                    rec = null;
+            byte[] rec_original = serialPort232.receiveData();
+            if(rec_original != null && rec_original.length >= 5) {
+                StringBuilder str2 = new StringBuilder();
+                for (byte aRec1 : rec_original) {
+                    str2.append(Integer.toHexString(aRec1&0xFF)).append(" ");
                 }
+                Log.w("happy", "232收到原始串口："+ str2);
+                /*如果指令前有乱码，掐头。如果指令后有乱码，去尾*/
+                if (rec_original[0] != (byte) 0xE2 || rec_original[rec_original.length - 2] != (byte) 0xF1) {
+                    boolean head = true;
+                    boolean trail = true;
+                    int start = 0;
+                    int end = 0;
+                    for (int y = 0; y < rec_original.length; y++) {
+                        if (head) {
+                            if (rec_original[y] == (byte)0xE2) {
+                                head = false;
+                                start = y;
+                            }
+                        }
+                        if (trail) {
+                            if (rec_original[rec_original.length - 1 - y] == (byte)0xF1) {
+                                trail = false;
+                                end = y - 1;
+                            }
+                        }
+                    }
+                    rec = new byte[rec_original.length - end - start];
+                    System.arraycopy(rec_original, start, rec, 0, rec_original.length - end - start);
+                    Log.w("happy", "232原始串口转换完毕："+ Arrays.toString(rec));
+                }else{
+                    rec = rec_original;
+                    Log.w("happy", "232原始直接赋值rec："+ Arrays.toString(rec));
+                }
+            }
+            if(rec != null && rec.length >= 4 && (rec[0] != (byte)0xE2 || rec[rec.length - 2] != (byte) 0xF1)){
+                rec = null;
             }
             if(rec != null && rec.length >= 5){
                 StringBuilder str1 = new StringBuilder();
                 for (byte aRec : rec) {
                     str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
                 }
-                Log.w("happy", "收到串口："+ str1);
+                Log.w("happy", "232收到串口："+ str1);
                 /*如果有两个串口指令前后衔接，合并接收到就拆分后运行两遍*/
                 byte[][] recReal = new byte[3][];
                 if(rec.length > (rec[1]&0xFF)){
@@ -126,6 +161,7 @@ public class ReceiveThreadAssist extends Thread {
                     recReal[0] = new byte[rec[1]&0xFF];
                     System.arraycopy(rec, 0, recReal[0], 0, rec[1]&0xFF);
                 }
+                rec = null;
 //                Log.w("happy", ""+ Arrays.deepToString(recReal));
                 for(int i = 0; i < onceRecNumber; i++){
                     switch (analyticReceive(recReal[i])){

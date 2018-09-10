@@ -39,14 +39,14 @@ public class OutGoodsService extends Service {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        mReceiveThread = new ReceiveThread(getApplicationContext());
         mReceiveThreadAssist = new ReceiveThreadAssist(getApplicationContext());
+        mReceiveThread = new ReceiveThread(getApplicationContext(),mReceiveThreadAssist);
         mSendThread = new SendThread(getApplicationContext(), mReceiveThread, mReceiveThreadAssist);
-        mReceiveThread.initReceiveThread();
         mReceiveThreadAssist.initReceiveThread();
+        mReceiveThread.initReceiveThread();
         mSendThread.initSendThread();
-        mReceiveThread.start();
         mReceiveThreadAssist.start();
+        mReceiveThread.start();
         mSendThread.start();
         Log.w("happy", "接收发送线程开启");
         Util.WriteFile("接收发送线程开启");

@@ -8,20 +8,32 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.njust.major.bean.Transaction;
 import com.njust.major.dao.MachineStateDao;
+import com.njust.major.dao.TransactionDao;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
+import com.njust.major.dao.impl.TransactionDaoImpl;
 import com.njust.major.thread.VMMainThread;
 
 
 public class VMService extends Service {
 
     private VMMainThread mainThread;
+    private TransactionDao tDao;
 
     @Override
     public void onCreate(){
         super.onCreate();
         Log.w("happy", "主线程开启");
         updateVersion();
+        tDao = new TransactionDaoImpl(getApplicationContext());
+        Transaction transaction = tDao.queryLastedTransaction();
+        if(transaction != null) {
+            if (transaction.getComplete() == 0) {
+                transaction.setComplete(1);
+                tDao.updateTransaction(transaction);
+            }
+        }
         mainThread = new VMMainThread(getApplicationContext());
         mainThread.start();
     }

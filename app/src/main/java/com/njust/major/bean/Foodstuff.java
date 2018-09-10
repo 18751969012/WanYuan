@@ -7,7 +7,7 @@ public class Foodstuff {
     private int positionID;   //商品位置
     private int stock;      //库存数量
     private int counter; //所在货柜
-    private int state;//1==可以， 2==不可以
+    private int state;//1==可以， 0==不可以
     private int price;
 
     public Foodstuff(int _id, int foodID, int positionID, int stock, int counter, int state, int price) {

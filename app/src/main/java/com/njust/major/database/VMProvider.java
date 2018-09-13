@@ -22,18 +22,14 @@ public class VMProvider extends ContentProvider {
     private static final int TDELETESUCESS = 3;
     private static final int TUPDATESUCESS = 4;
     private static final int TQUERYSUCESS = 5;
-    private static final int FINSERTSUCESS = 6;
-    private static final int FDELETESUCESS = 7;
-    private static final int FUPDATESUCESS = 8;
-    private static final int FQUERYSUCESS = 9;
-    private static final int PINSERTSUCESS = 10;
-    private static final int PDELETESUCESS = 11;
-    private static final int PUPDATESUCESS = 12;
-    private static final int PQUERYSUCESS = 13;
-    private static final int EINSERTSUCESS = 14;
-    private static final int EDELETESUCESS = 15;
-    private static final int EUPDATESUCESS = 16;
-    private static final int EQUERYSUCESS = 17;
+    private static final int PINSERTSUCESS = 6;
+    private static final int PDELETESUCESS = 7;
+    private static final int PUPDATESUCESS = 8;
+    private static final int PQUERYSUCESS = 9;
+    private static final int EINSERTSUCESS = 10;
+    private static final int EDELETESUCESS = 11;
+    private static final int EUPDATESUCESS = 12;
+    private static final int EQUERYSUCESS = 13;
 
 
     private MyOpenHelper mMyOpenHelper;
@@ -45,10 +41,6 @@ public class VMProvider extends ContentProvider {
         sURIMatcher.addURI("com.njust", "t/Tdelete", TDELETESUCESS);
         sURIMatcher.addURI("com.njust", "t/Tupdate", TUPDATESUCESS);
         sURIMatcher.addURI("com.njust", "t/Tquery", TQUERYSUCESS);
-        sURIMatcher.addURI("com.njust", "Finsert", FINSERTSUCESS);
-        sURIMatcher.addURI("com.njust", "Fdelete", FDELETESUCESS);
-        sURIMatcher.addURI("com.njust", "Fupdate", FUPDATESUCESS);
-        sURIMatcher.addURI("com.njust", "Fquery", FQUERYSUCESS);
         sURIMatcher.addURI("com.njust", "Pinsert", PINSERTSUCESS);
         sURIMatcher.addURI("com.njust", "Pdelete", PDELETESUCESS);
         sURIMatcher.addURI("com.njust", "Pupdate", PUPDATESUCESS);
@@ -81,10 +73,6 @@ public class VMProvider extends ContentProvider {
             SQLiteDatabase db = mMyOpenHelper.getReadableDatabase();
             Cursor cursor = db.query("MachineInfo", projection, selection, selectionArgs, null, null, sortOrder);
             return cursor;
-        } else if (code == FQUERYSUCESS){
-            SQLiteDatabase db = mMyOpenHelper.getReadableDatabase();
-            Cursor cursor = db.query("FoodInfo", projection, selection, selectionArgs, null, null, sortOrder);
-            return cursor;
         }else if (code == PQUERYSUCESS){
             SQLiteDatabase db = mMyOpenHelper.getReadableDatabase();
             Cursor cursor = db.query("PositionInfo", projection, selection, selectionArgs, null, null, sortOrder);
@@ -115,10 +103,6 @@ public class VMProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
             Uri uri2 = Uri.parse("insert/" + insert);
             return uri2;
-        } else if (code == FINSERTSUCESS) {
-            long insert = sqldb.insert("FoodInfo", null, values);
-            Uri uri2 = Uri.parse("insert/" + insert);
-            return uri2;
         }else if (code == PINSERTSUCESS){
             long insert = sqldb.insert("PositionInfo", null, values);
             Uri uri2 = Uri.parse("insert/" + insert);
@@ -140,10 +124,6 @@ public class VMProvider extends ContentProvider {
         if (code == TDELETESUCESS) {
             int delete = sqldb.delete("TransactionInfo", selection,
                     selectionArgs);
-            return delete;
-        } else if (code == FDELETESUCESS) {
-            int delete = sqldb
-                    .delete("FoodInfo", selection, selectionArgs);
             return delete;
         }else if (code == PDELETESUCESS){
             int delete = sqldb
@@ -167,11 +147,7 @@ public class VMProvider extends ContentProvider {
                     selectionArgs);
             getContext().getContentResolver().notifyChange(uri, null);
             return update;
-        } else if (code == FUPDATESUCESS) {
-            int update = sqldb.update("FoodInfo", values, selection,
-                    selectionArgs);
-            return update;
-        } else if (code == MUPDATESUCESS) {
+        }else if (code == MUPDATESUCESS) {
             int update = sqldb.update("MachineInfo", values, selection,
                     selectionArgs);
             getContext().getContentResolver().notifyChange(uri, null);

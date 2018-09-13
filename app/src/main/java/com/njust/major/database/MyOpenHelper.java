@@ -68,15 +68,6 @@ public class MyOpenHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(MachineInfo_table);
 
-        String FoodInfo_table = "create table FoodInfo( _id integer primary key autoincrement, " +
-                "foodID integer," +
-                "positionID integer," +
-                "stock integer," +
-                "counter integer," +
-                "state integer,"+
-                "price integer)";
-        sqLiteDatabase.execSQL(FoodInfo_table);
-
         String Transaction_table = "create table TransactionInfo(" +
                 "_id integer primary key autoincrement," +
                 "orderNO nvarchar(100)," +
@@ -84,7 +75,7 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                 "type integer," +
                 "beginTime datetime default CURRENT_TIMESTAMP," +
                 "endTime datetime," +
-                "foodIDs nvarchar(100),"+
+                "positionIDs nvarchar(100),"+
                 "error integer)";
         sqLiteDatabase.execSQL(Transaction_table);
 
@@ -144,18 +135,10 @@ public class MyOpenHelper extends SQLiteOpenHelper {
 
 
 
-        for (int i = 1; i <= 100; i++ ){
-            String sql = "insert into FoodInfo(foodID,positionID,stock,counter,state,price) values ("
-                    +i +","+i+","+"100,1,1,1)";
-            db.execSQL(sql);
-            String sql1 = "insert into FoodInfo(foodID,positionID,stock,counter,state,price) values ("
-                    +(i+100) +","+(i+100)+","+"100,2,1,1)";
-            db.execSQL(sql1);
-        }
 
 
         for (int i = 1; i <= 2; i++ ){
-            for(int j = 1; j<= 6; j++ ){
+            for(int j = 1; j<= 10; j++ ){
                 for(int k = 1; k<= 10; k++ ){
                     int T = 0;
                     if(i == 1){
@@ -183,7 +166,7 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                         }
                     }
                     String sql = "insert into PositionInfo(positionID,counter,state,motorType,position1,position2) values ("
-                            +((j-1)*10+k) +","+i+","+1+","+T+","+(j*16+k)+","+(j*16+k)+")";
+                            +((i-1)*100+(j-1)*10+k) +","+i+","+1+","+T+","+(j*16+k)+","+(j*16+k)+")";
                     db.execSQL(sql);
                 }
             }

@@ -2,6 +2,7 @@ package com.njust;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,7 +12,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.njust.major.SCM.MotorControl;
+import com.njust.major.config.Constant;
 import com.njust.major.setting.SettingTestThread;
+import com.njust.major.util.Util;
 
 import org.w3c.dom.Text;
 
@@ -19,6 +22,9 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.njust.VMApplication.midZNum;
+import static com.njust.VMApplication.rimZNum1;
+import static com.njust.major.error.errorHandling.byteTo8Byte;
 
 
 public class SettingTestActivty extends AppCompatActivity implements View.OnClickListener {
@@ -28,9 +34,16 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
     private MotorControl motorControl;
     private SerialPort serialPort;
     private final SerialPort mSerialPort = new SerialPort(1, 38400, 8, 'n', 1);
-    private int counter = 1;
+    public int counter = 1;
     private TextView mNowCounter;
     private byte zhen = 0;
+    private int delay = 100;
+
+    public String outFoodResponse;
+    public String getFoodResponse;
+    public String fallFoodResponse;
+    public String foodRoadResponse;
+    public String xResponse;
 
     private TextView mQuHuoMotor;
     private TextView mLuoHuoMotor;
@@ -95,6 +108,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         Button xMotorZhen = (Button) findViewById(R.id.x_motor_zhen);
         Button xMotorFan = (Button) findViewById(R.id.x_motor_fan);
         Button mHoudao = (Button) findViewById(R.id.houdao_motor);
+        Button returnBack = (Button) findViewById(R.id.return_back_button);
         mHuoDaoMotor = (TextView) findViewById(R.id.huodao_msg);
         mChuHuoMotor = (TextView) findViewById(R.id.chuhuo_msg);
         mLuoHuoMotor = (TextView) findViewById(R.id.luohuo_msg);
@@ -116,6 +130,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         openDoorHeat.setOnClickListener(this);
         closeDoorHeat.setOnClickListener(this);
         mHoudao.setOnClickListener(this);
+        returnBack.setOnClickListener(this);
         serialPort = mSerialPort;
         motorControl = new MotorControl(serialPort, getApplicationContext());
         settingTestThread = new SettingTestThread();
@@ -135,33 +150,26 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
                 int tmpRow = Integer.parseInt(mRow.getText().toString());
                 int tmpColumn = Integer.parseInt(mColumn.getText().toString());
                 Log.i("happy", "货道测试");
-                if (tmpRow != 0 && tmpColumn != 0) {
-                    motorControl.pushTestCommand(counter, zhen++, 1, tmpRow, tmpColumn);
-                } else if (tmpRow != 0 && tmpColumn == 0) {
-                    motorControl.pushTestCommand(counter, zhen++, 2, tmpRow, tmpColumn);
-                } else if (tmpRow == 0 && tmpColumn != 0) {
-                    motorControl.pushTestCommand(counter, zhen++, 3, tmpRow, tmpColumn);
-                } else if (tmpRow == 0 && tmpColumn == 0) {
-                    motorControl.pushTestCommand(counter, zhen++, 4, tmpRow, tmpColumn);
-                }
+                houdao_motor(tmpRow,tmpColumn);
+                mHuoDaoMotor.setText(foodRoadResponse);
                 break;
             case R.id.open_get_door:
-                motorControl.centerCommand(zhen++, 4);
+                openGetGoodsDoor();
                 break;
             case R.id.close_get_door:
-                motorControl.centerCommand(zhen++, 5);
+                closeGetGoodsDoor();
                 break;
             case R.id.open_out_door:
-                motorControl.counterCommand(counter, zhen++, 12);
+                openOutGoodsDoor();
                 break;
             case R.id.close_out_door:
-                motorControl.counterCommand(counter, zhen++, 13);
+                closeOutGoodsDoor();
                 break;
             case R.id.open_fall_door:
-                motorControl.centerCommand(zhen++, 6);
+                openDropGoodsDoor();
                 break;
             case R.id.close_fall_door:
-                motorControl.centerCommand(zhen++, 6);
+                closeDropGoodsDoor();
                 break;
             case R.id.open_center_lock:
                 motorControl.centerCommand(zhen++, 3);
@@ -185,10 +193,17 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
                 motorControl.counterCommand(counter, zhen++, 4);
                 break;
             case R.id.x_motor_zhen:
-                motorControl.counterCommand(counter,zhen++,10);
+                moveHorizontal(1);
                 break;
             case R.id.x_motor_fan:
-                motorControl.counterCommand(counter, zhen++,11);
+                moveHorizontal(2);
+                break;
+            case R.id.return_back_button:
+                this.finish();
+                timerTask.cancel();
+                timer.cancel();
+                settingTestThread.sendflag = false;
+                break;
         }
     }
 
@@ -203,26 +218,251 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         }
     }
 
-
-
+    private void houdao_motor(int tmpRow, int tmpColumn){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            if (tmpRow != 0 && tmpColumn != 0) {
+                motorControl.pushTestCommand(counter, zhen++, 1, tmpRow, tmpColumn);
+            } else if (tmpRow != 0 && tmpColumn == 0) {
+                motorControl.pushTestCommand(counter, zhen++, 2, tmpRow, tmpColumn);
+            } else if (tmpRow == 0 && tmpColumn != 0) {
+                motorControl.pushTestCommand(counter, zhen++, 3, tmpRow, tmpColumn);
+            } else if (tmpRow == 0 && tmpColumn == 0) {
+                motorControl.pushTestCommand(counter, zhen++, 4, tmpRow, tmpColumn);
+            }
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x39 && rec[3] == (byte)(0x80+(counter-1)) && rec[7] == (byte)0x50){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            if(counter == 1){
+                                settingTestThread.foodRoadFlag1 = true;
+                            }else{
+                                settingTestThread.foodRoadFlag2 = true;
+                            }
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "货道板通信故障");
+                Util.WriteFile("货道板通信故障");
+            }
+        }
+    }
+    private void openGetGoodsDoor(){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.openGetGoodsDoor(midZNum);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            midZNum++;
+                            settingTestThread.openGetFoodFlag = true;
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "中柜板通信故障");
+            }
+        }
+    }
+    private void closeGetGoodsDoor(){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.closeGetGoodsDoor(midZNum);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            midZNum++;
+                            settingTestThread.openGetFoodFlag = true;
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "中柜板通信故障");
+                Util.WriteFile("中柜板通信故障");
+            }
+        }
+    }
+    private void openOutGoodsDoor(){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.openOutGoodsDoor(counter,rimZNum1);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x6F && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x5A){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            rimZNum1++;
+                            if(counter == 1){
+                                settingTestThread.openOutFoodFlag1 = true;
+                            }else{
+                                settingTestThread.openOutFoodFlag2 = true;
+                            }
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "边柜板通信故障");
+                Util.WriteFile("边柜板通信故障");
+            }
+        }
+    }
+    private void closeOutGoodsDoor(){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.closeOutGoodsDoor(counter,rimZNum1);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x63 && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x5A){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            rimZNum1++;
+                            if(counter == 1){
+                                settingTestThread.closeOutFoodFlag1 = true;
+                            }else{
+                                settingTestThread.closeOutFoodFlag2 = true;
+                            }
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "边柜板通信故障");
+                Util.WriteFile("边柜板通信故障");
+            }
+        }
+    }
+    private void openDropGoodsDoor(){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.openDropGoodsDoor(midZNum);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            midZNum++;
+                            settingTestThread.openFallFoodFlag = true;
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "中柜板通信故障");
+                Util.WriteFile("中柜板通信故障");
+            }
+        }
+    }
+    private void closeDropGoodsDoor(){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.closeDropGoodsDoor(midZNum);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            midZNum++;
+                            settingTestThread.closeFallFoodFlag = true;
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "中柜板通信故障");
+                Util.WriteFile("中柜板通信故障");
+            }
+        }
+    }
+    private void moveHorizontal(int orientation){
+        boolean flag = true;
+        int times = 0;
+        while (flag){
+            motorControl.moveHorizontal(counter,rimZNum1,orientation,3600);
+            SystemClock.sleep(delay);
+            byte[] rec = serialPort.receiveData();
+            if (rec != null && rec.length >= 5) {
+                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                    if(rec[6] == (byte)0x78 && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x58){
+                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                            flag = false;
+                            rimZNum1++;
+                            if(counter == 1){
+                                settingTestThread.xFlag1 = true;
+                            }else{
+                                settingTestThread.xFlag2 = true;
+                            }
+                        }
+                    }
+                }
+            }
+            times = times + 1;
+            if(times == 5){
+                flag = false;
+                Log.w("happy", "边柜板通信故障");
+                Util.WriteFile("边柜板通信故障");
+            }
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         timerTask.cancel();
         timer.cancel();
+        settingTestThread.sendflag = false;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        settingTestThread.sendflag = false;
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        settingTestThread.sendflag = true;
-
     }
 }

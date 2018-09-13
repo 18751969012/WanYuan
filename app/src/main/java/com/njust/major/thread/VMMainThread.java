@@ -2,19 +2,15 @@ package com.njust.major.thread;
 
 import android.content.Context;
 import android.database.ContentObserver;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
 import com.njust.SerialPort;
 import com.njust.major.SCM.MotorControl;
 import com.njust.major.bean.MachineState;
-import com.njust.major.bean.Transaction;
-import com.njust.major.dao.FoodDao;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.PositionDao;
 import com.njust.major.dao.TransactionDao;
-import com.njust.major.dao.impl.FoodDaoImpl;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
 import com.njust.major.dao.impl.PositionDaoImpl;
 import com.njust.major.dao.impl.TransactionDaoImpl;
@@ -24,9 +20,11 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import static com.njust.VMApplication.VMMainThreadFlag;
-import static com.njust.VMApplication.leftZhenNumber;
-import static com.njust.VMApplication.midZhenNumber;
-import static com.njust.VMApplication.rightZhenNumber;
+import static com.njust.VMApplication.rimZNum1;
+import static com.njust.VMApplication.rimZNum2;
+import static com.njust.VMApplication.aisleZNum1;
+import static com.njust.VMApplication.aisleZNum2;
+import static com.njust.VMApplication.midZNum;
 
 
 public class VMMainThread extends Thread {
@@ -50,7 +48,6 @@ public class VMMainThread extends Thread {
         this.context = context;
         serialPort485 = new SerialPort(1, 38400, 8, 'n', 1);
         motorControl = new MotorControl(serialPort485, context);
-        FoodDao fDao = new FoodDaoImpl(context);
         PositionDao pDao = new PositionDaoImpl(context);
         TransactionDao tDao = new TransactionDaoImpl(context);
         mDao = new MachineStateDaoImpl(context);
@@ -92,7 +89,7 @@ public class VMMainThread extends Thread {
         while (true) {
             if (VMMainThreadFlag) {
                 if (mQueryFlag) {
-                    motorControl.counterQuery(1,leftZhenNumber++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
+                    motorControl.counterQuery(1,rimZNum1++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
                     for (int i = 0; i < 5; i++) {
                         try {
                             Thread.sleep(100);
@@ -124,7 +121,7 @@ public class VMMainThread extends Thread {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.counterQuery(2, rightZhenNumber++, machineState.getRightTempState(), machineState.getRightSetTemp());
+                    motorControl.counterQuery(2, rimZNum2++, machineState.getRightTempState(), machineState.getRightSetTemp());
                     for (int i = 0; i < 5; i++) {
                         try {
                             Thread.sleep(100);
@@ -155,7 +152,7 @@ public class VMMainThread extends Thread {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.centerQuery(midZhenNumber++);
+                    motorControl.centerQuery(midZNum++);
                     for (int i = 0; i < 5; i++) {
                         try {
                             Thread.sleep(100);
@@ -171,8 +168,6 @@ public class VMMainThread extends Thread {
                                 state[29] = rec[10];//落货光栅状态，0=正常，1=故障
                                 state[30] = rec[11];//防夹手光栅状态，0=正常，1=故障
                                 state[31] = rec[12] * 256 + rec[13];//备用字节
-
-
                                 break;
                             }
                         }
@@ -181,63 +176,73 @@ public class VMMainThread extends Thread {
 
                 }
                 if (changeStateFlag) {
-                    motorControl.counterCommand(1, leftZhenNumber++, machineState.getLeftLight() == 1 ? 1 : 2);
+                    motorControl.counterCommand(1, rimZNum1++, machineState.getLeftLight() == 1 ? 1 : 2);
                     try {
                         Thread.sleep(150);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.counterCommand(2, rightZhenNumber++, machineState.getRightLight() == 1 ? 1 : 2);
+                    motorControl.counterCommand(2, rimZNum2++, machineState.getRightLight() == 1 ? 1 : 2);
                     try {
                         Thread.sleep(150);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.counterCommand(1, leftZhenNumber++, machineState.getLeftDoorheat() == 1 ? 3 : 4);
+                    motorControl.counterCommand(1, rimZNum1++, machineState.getLeftDoorheat() == 1 ? 3 : 4);
                     try {
                         Thread.sleep(150);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.counterCommand(2, rightZhenNumber++, machineState.getRightDoorheat() == 1 ? 3 : 4);
+                    motorControl.counterCommand(2, rimZNum2++, machineState.getRightDoorheat() == 1 ? 3 : 4);
                     try {
                         Thread.sleep(150);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.centerCommand(midZhenNumber++, machineState.getMidLight() == 1 ? 1 : 2);
+                    motorControl.centerCommand(midZNum++, machineState.getMidLight() == 1 ? 1 : 2);
                     try {
                         Thread.sleep(150);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.counterQuery(1, midZhenNumber++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
+                    motorControl.counterQuery(1, rimZNum1++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
                     try {
                         Thread.sleep(150);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    motorControl.counterQuery(2, rightZhenNumber++, machineState.getRightTempState(), machineState.getRightSetTemp());
+                    motorControl.counterQuery(2, rimZNum2++, machineState.getRightTempState(), machineState.getRightSetTemp());
                     tmpMachineState = machineState;
 
                     changeStateFlag = false;
                     mQueryFlag = true;
 
                 }
-                if (leftZhenNumber >= 256) {
-                    leftZhenNumber = 0;
-                }
-                if (rightZhenNumber >= 256) {
-                    rightZhenNumber = 0;
-                }
-                if (midZhenNumber >= 256) {
-                    midZhenNumber = 0;
-                }
+
             }
+            updateZhen();
         }
     }
 
     public void saveAndBroadcastmsg(){
 
+    }
+    private void updateZhen(){
+        if (rimZNum1 >= 256) {
+            rimZNum1 = 0;
+        }
+        if (rimZNum2 >= 256) {
+            rimZNum2 = 0;
+        }
+        if (aisleZNum1 >= 256) {
+            aisleZNum1 = 0;
+        }
+        if (aisleZNum2 >= 256) {
+            aisleZNum2 = 0;
+        }
+        if (midZNum >= 256) {
+            midZNum = 0;
+        }
     }
 }

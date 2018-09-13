@@ -29,7 +29,7 @@ public class TransactionDaoImpl implements TransactionDao {
         values.put("type", transaction.getType());
         values.put("beginTime", transaction.getBeginTime());
         values.put("endTime", transaction.getEndTime());
-        values.put("foodIDs", transaction.getFoodIDs());
+        values.put("positionIDs", transaction.getPositionIDs());
         values.put("error", transaction.getError());
 
         Uri insert = context.getContentResolver().insert(uri, values);
@@ -50,7 +50,7 @@ public class TransactionDaoImpl implements TransactionDao {
         values.put("complete", transaction.getComplete());
         values.put("type", transaction.getType());
         values.put("endTime", transaction.getEndTime());
-        values.put("foodIDs", transaction.getFoodIDs());
+        values.put("positionIDs", transaction.getPositionIDs());
         values.put("error", transaction.getError());
 
         int update = context.getContentResolver().update(uri, values,
@@ -71,10 +71,10 @@ public class TransactionDaoImpl implements TransactionDao {
             int type = cursor.getInt(3);
             String beginTime = cursor.getString(4);
             String endTime = cursor.getString(5);
-            String foodIDs = cursor.getString(6);
+            String positionIDs = cursor.getString(6);
             int error = cursor.getInt(7);
             transaction = new Transaction(_id, orderNO, complete, type, beginTime,
-                    endTime, foodIDs, error);
+                    endTime, positionIDs, error);
             cursor.close();
         }
         return transaction;
@@ -95,9 +95,9 @@ public class TransactionDaoImpl implements TransactionDao {
                 int type = cursor.getInt(3);
                 String beginTime = cursor.getString(4);
                 String endTime = cursor.getString(5);
-                String foodIDs = cursor.getString(6);
+                String positionIDs = cursor.getString(6);
                 int error = cursor.getInt(7);
-                Transaction bean = new Transaction(_id, orderNO, complete,type, beginTime, endTime,foodIDs,error);
+                Transaction bean = new Transaction(_id, orderNO, complete,type, beginTime, endTime,positionIDs,error);
                 list.add(bean);
             }
             cursor.close();

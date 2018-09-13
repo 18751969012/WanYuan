@@ -32,7 +32,7 @@
         <activity android:name=".SettingActivity"
             android:exported="true"/>
         <activity android:name=".SettingTestActivty"/>
-        <activity android:name=".SettingPositionActivity"/>
+
         <provider
             android:name=".major.database.VMProvider"
             android:authorities="com.njust"

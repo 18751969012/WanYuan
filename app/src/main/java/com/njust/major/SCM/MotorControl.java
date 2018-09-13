@@ -7,7 +7,6 @@ import com.njust.major.bean.MachineState;
 import com.njust.major.bean.Position;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.PositionDao;
-import com.njust.major.dao.impl.FoodDaoImpl;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
 import com.njust.major.dao.impl.PositionDaoImpl;
 import com.njust.major.dao.impl.TransactionDaoImpl;
@@ -23,14 +22,13 @@ public class MotorControl {
 
     public MotorControl(SerialPort serialPort485, Context context) {
         motorPort = serialPort485;
-        new FoodDaoImpl(context);
         mDao = new MachineStateDaoImpl(context);
         pDao = new PositionDaoImpl(context);
         new TransactionDaoImpl(context);
     }
 
     /**
-     * 垂直移层指令
+     * 垂直移层_货道指令
      * 说明：边柜板驱动Y电机升降云台到指定层位
      * @param counter 货柜号 1=左柜（主柜），2 =右柜（辅柜）
      * @param zhenNumber 本帧编号
@@ -59,7 +57,39 @@ public class MotorControl {
 
 
     /**
-     * 水平移位指令
+     * 垂直移层_出货口指令
+     * 说明：边柜板驱动Y电机升降云台到出货口
+     * @param counter 货柜号 1=左柜（主柜），2 =右柜（辅柜）
+     * @param zhenNumber 本帧编号
+     * */
+    public void moveFloorOut(int counter ,int zhenNumber) {
+        MachineState queryMachineState = mDao.queryMachineState();
+        MotorControlTXBuf = new byte[10];
+        MotorControlTXBuf[0] = (byte) 0xE2;
+        MotorControlTXBuf[1] = (byte) 0x0A;
+        MotorControlTXBuf[2] = (byte) (0xC0+(counter-1));
+        MotorControlTXBuf[3] = (byte) 0x00;
+        MotorControlTXBuf[4] = (byte) 0x01;
+        MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
+        if(counter == 1){
+            MotorControlTXBuf[6] = (byte) ((queryMachineState.getLeftOutPosition() >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) (queryMachineState.getLeftOutPosition() & 0xFF);
+        }else{
+            MotorControlTXBuf[6] = (byte) ((queryMachineState.getRightOutPosition() >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) (queryMachineState.getRightOutPosition() & 0xFF);
+        }
+        MotorControlTXBuf[8] = (byte) 0xF1;
+        int sum = 0;
+        for (int i = 0; i <9; i++) {
+            sum = sum + MotorControlTXBuf[i];
+        }
+        MotorControlTXBuf[9] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 10);
+    }
+
+
+    /**
+     * 水平移位_错位指令
      * 说明：边柜板驱动X电机左右移动云台履带
      * @param counter 货柜号 1=左柜（主柜），2 =右柜（辅柜）
      * @param zhenNumber 本帧编号
@@ -67,6 +97,32 @@ public class MotorControl {
      * @param moveTime 边柜X轴电机移动时间 单位：毫秒，orientation = 0时无意义
      * */
     public void moveHorizontal(int counter ,int zhenNumber ,int orientation ,int moveTime) {
+        MotorControlTXBuf = new byte[11];
+        MotorControlTXBuf[0] = (byte) 0xE2;
+        MotorControlTXBuf[1] = (byte) 0x0B;
+        MotorControlTXBuf[2] = (byte) (0xC0+(counter-1));
+        MotorControlTXBuf[3] = (byte) 0x00;
+        MotorControlTXBuf[4] = (byte) 0x02;
+        MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
+        MotorControlTXBuf[6] = (byte) orientation;
+        MotorControlTXBuf[7] = (byte) ((moveTime >> 8) & 0xFF);
+        MotorControlTXBuf[8] = (byte) (moveTime & 0xFF);
+        MotorControlTXBuf[9] = (byte) 0xF1;
+        int sum = 0;
+        for (int i = 0; i <10; i++) {
+            sum = sum + MotorControlTXBuf[i];
+        }
+        MotorControlTXBuf[10] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 11);
+    }
+
+    /**
+     * 水平移位_推入出货口指令
+     * 说明：边柜板驱动X电机左右移动云台履带
+     * @param counter 货柜号 1=左柜（主柜），2 =右柜（辅柜）
+     * @param zhenNumber 本帧编号
+     * */
+    public void moveHorizontalOut(int counter ,int zhenNumber, int orientation ,int moveTime) {
         MotorControlTXBuf = new byte[11];
         MotorControlTXBuf[0] = (byte) 0xE2;
         MotorControlTXBuf[1] = (byte) 0x0B;

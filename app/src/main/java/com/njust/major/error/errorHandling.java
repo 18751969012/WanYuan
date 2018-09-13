@@ -6,19 +6,15 @@ import android.os.SystemClock;
 import android.util.Log;
 
 
+import com.njust.major.bean.MachineState;
 import com.njust.major.bean.Malfunction;
 import com.njust.major.bean.Transaction;
-import com.njust.major.dao.FoodDao;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.MalfunctionDao;
 import com.njust.major.dao.TransactionDao;
-import com.njust.major.dao.impl.FoodDaoImpl;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
 import com.njust.major.dao.impl.MalfunctionDaoImpl;
 import com.njust.major.dao.impl.TransactionDaoImpl;
-import com.njust.major.thread.ReceiveThread;
-import com.njust.major.thread.ReceiveThreadAssist;
-import com.njust.major.thread.SendThread;
 import com.njust.major.util.Util;
 
 
@@ -26,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import static com.njust.VMApplication.OutGoodsThreadFlag;
 import static com.njust.VMApplication.current_transaction_order_number;
 
 public class errorHandling {
@@ -36,7 +33,6 @@ public class errorHandling {
 	 * @param rec 九字节的组件应答数据
 	 * */
 	public errorHandling(Context context,int counter, byte module, byte[] rec) {
-		FoodDao foodDao = new FoodDaoImpl(context);
 		MachineStateDao machineStateDao = new MachineStateDaoImpl(context);
 		MalfunctionDao malfunctionDao = new MalfunctionDaoImpl(context);
 		TransactionDao transactionDao = new TransactionDaoImpl(context);
@@ -48,11 +44,14 @@ public class errorHandling {
 		String Counter;
 		if(counter == 0){
 			Counter = "中柜";
-			foodDao.updateAllState(1,2);
-			foodDao.updateAllState(2,2);
+			machineStateDao.updateState(1);
 		}else{
 			Counter = counter == 1? "左柜":"右柜";
-			foodDao.updateAllState(counter,2);
+			if(counter == 1){
+				machineStateDao.updateCounterState(1,0);
+			}else {
+				machineStateDao.updateCounterState(0,1);
+			}
 		}
 		switch (module) {
             /*字符“Y”，表示驱动Y轴电机的应答*/
@@ -359,13 +358,10 @@ public class errorHandling {
 			}
 			default:break;
 		}
-//		Intent intent = new Intent();
-//		intent.setAction("multiMachine_Action_Error");
-//		intent.putExtra("transactionID", transaction.get_id());
-//		context.sendBroadcast(intent);
 		transaction.setComplete(1);
 		transaction.setError(1);
 		transactionDao.updateTransaction(transaction);
+		OutGoodsThreadFlag = false;
 		SystemClock.sleep(20);
 		Intent intent = new Intent();
 		intent.setAction("njust_outgoods_complete");

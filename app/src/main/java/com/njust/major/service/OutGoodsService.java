@@ -6,50 +6,33 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.njust.major.thread.ReceiveThread;
-import com.njust.major.thread.ReceiveThreadAssist;
-import com.njust.major.thread.SendThread;
-import com.njust.major.error.errorHandling;
+import com.njust.major.thread.OutGoodsThread;
 import com.njust.major.util.Util;
 
-import java.io.IOException;
-
 import static com.njust.VMApplication.VMMainThreadFlag;
-import static com.njust.VMApplication.SendThreadFlag;
-import static com.njust.VMApplication.ReceiveThreadFlag;
+import static com.njust.VMApplication.OutGoodsThreadFlag;
 
 
 public class OutGoodsService extends Service {
-
-    private ReceiveThread mReceiveThread;
-    private ReceiveThreadAssist mReceiveThreadAssist;
-    private SendThread mSendThread;
+    private OutGoodsThread mOutGoodsThread;
 
 
     @Override
     public void onCreate(){
         super.onCreate();
-        Log.w("happy", "主线程停止，接收发送线程主标志位开启");
-        Util.WriteFile("主线程停止，接收发送线程主标志位开启");
         VMMainThreadFlag = false;
-        SendThreadFlag = true;
-        ReceiveThreadFlag = true;
+        OutGoodsThreadFlag = true;
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        mReceiveThreadAssist = new ReceiveThreadAssist(getApplicationContext());
-        mReceiveThread = new ReceiveThread(getApplicationContext(),mReceiveThreadAssist);
-        mSendThread = new SendThread(getApplicationContext(), mReceiveThread, mReceiveThreadAssist);
-        mReceiveThreadAssist.initReceiveThread();
-        mReceiveThread.initReceiveThread();
-        mSendThread.initSendThread();
-        mReceiveThreadAssist.start();
-        mReceiveThread.start();
-        mSendThread.start();
-        Log.w("happy", "接收发送线程开启");
-        Util.WriteFile("接收发送线程开启");
+        mOutGoodsThread = new OutGoodsThread(getApplicationContext());
+        mOutGoodsThread.init();
+        mOutGoodsThread.start();
+
+        Log.w("happy", "出货主线程开启");
+        Util.WriteFile("出货主线程开启");
     }
 
 

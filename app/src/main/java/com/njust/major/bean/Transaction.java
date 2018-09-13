@@ -10,17 +10,17 @@ public class Transaction {
     private int type;
     private String beginTime;
     private String endTime;
-    private String foodIDs;
+    private String positionIDs;
     private int error;//本次交易是否故障，0=成功，1=故障。
 
-    public Transaction(int _id, String orderNO, int complete, int type, String beginTime, String endTime, String foodIDs, int error) {
+    public Transaction(int _id, String orderNO, int complete, int type, String beginTime, String endTime, String positionIDs, int error) {
         this._id = _id;
         this.orderNO = orderNO;
         this.complete = complete;
         this.type = type;
         this.beginTime = beginTime;
         this.endTime = endTime;
-        this.foodIDs = foodIDs;
+        this.positionIDs = positionIDs;
         this.error = error;
     }
 
@@ -72,12 +72,12 @@ public class Transaction {
         this.endTime = endTime;
     }
 
-    public String getFoodIDs() {
-        return foodIDs;
+    public String getPositionIDs() {
+        return positionIDs;
     }
 
-    public void setFoodIDs(String foodIDs) {
-        this.foodIDs = foodIDs;
+    public void setPositionIDs(String positionIDs) {
+        this.positionIDs = positionIDs;
     }
 
     public int getError() {
@@ -96,7 +96,7 @@ public class Transaction {
                 ", type=" + type +
                 ", beginTime='" + beginTime + '\'' +
                 ", endTime='" + endTime + '\'' +
-                ", foodIDs='" + foodIDs + '\'' +
+                ", foodIDs='" + positionIDs + '\'' +
                 ", error=" + error +
                 '}';
     }

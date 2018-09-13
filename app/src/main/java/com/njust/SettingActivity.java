@@ -3,6 +3,7 @@ package com.njust;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,13 +13,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.njust.major.SCM.MotorControl;
-import com.njust.major.bean.MachineState;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
-import com.njust.major.setting.SettingReceiveThread;
 
-import java.util.Arrays;
-
+import static com.njust.major.error.errorHandling.byteTo8Byte;
 
 
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener {
@@ -45,7 +43,10 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private int counter = 1;
     private Context mContext;
     private byte zhen = 0;
-    SettingReceiveThread settingReceiveThread;
+    private int delay = 100;
+    private int[] yResponse = new int[5];
+    private String Response;
+
 
 
     @Override
@@ -78,8 +79,10 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         Button manuelConfirm = (Button) findViewById(R.id.manuel_confirm_floor_no);
         Button getInTestActivty = (Button) findViewById(R.id.test_activity_button);
         Button positionSettingButton = (Button) findViewById(R.id.position_activity_button);
+        Button returnBack = (Button) findViewById(R.id.return_back_button);
 
 
+        returnBack.setOnClickListener(this);
         positionSettingButton.setOnClickListener(this);
         fastUp.setOnClickListener(this);
         slowUp.setOnClickListener(this);
@@ -95,10 +98,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         manuelConfirm.setOnClickListener(this);
         getInTestActivty.setOnClickListener(this);
         serialPort = mSerialPort;
-        settingReceiveThread = new SettingReceiveThread(serialPort);
         motorControl = new MotorControl(serialPort, mContext);
-        settingReceiveThread.sendFlag = true;
-        settingReceiveThread.start();
     }
 
     @Override
@@ -110,15 +110,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onPause() {
         super.onPause();
-        settingReceiveThread.sendFlag = false;
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        settingReceiveThread.sendFlag = true;
-
     }
 
     @Override
@@ -137,15 +133,70 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 motorControl.counterCommand(counter, zhen++, 8);
                 break;
             case R.id.stop:
-                motorControl.counterCommand(counter, zhen++, 9);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                boolean flag = true;
+                int times = 0;
+                while (flag){
+                    motorControl.counterCommand(counter, zhen++, 9);
+                    SystemClock.sleep(delay);
+                    byte[] rec = serialPort.receiveData();
+                    if (rec != null && rec.length >= 5) {
+                        if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                            if(rec[6] == (byte)0x31 && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x59){
+                                if(rec[18] == (byte)0x02){
+                                    flag = false;
+                                    yResponse[0] = (rec[8]&0xff) * 256 + (rec[9]&0xff);
+                                    yResponse[1] = (rec[10]&0xff) * 256 + (rec[11]&0xff);
+                                    yResponse[2] = (rec[12]&0xff) * 256 + (rec[13]&0xff);
+                                    yResponse[3] = (rec[14]&0xff) * 256 + (rec[15]&0xff);
+                                    yResponse[4] = (rec[16]&0xff) * 256 + (rec[17]&0xff);
+                                    thisFloorPosition = yResponse[4];
+                                    Log.i("happy", "进来了"+yResponse[4]);
+                                    Response = "";
+                                    byte error1[];
+                                    error1 = byteTo8Byte(rec[9]);
+                                    if (error1[0] != (byte)0x00) {
+                                        Response += "已执行动作 ";
+                                    } else {
+                                        Response += "未执行动作 ";
+                                    }
+                                    if(error1[1] == (byte)0x01){
+                                        Response += "Y轴电机过流，";
+                                    }
+                                    if(error1[2] == (byte)0x01){
+                                        Response += "Y轴电机断路，";
+                                    }
+                                    if(error1[3] == (byte)0x01){
+                                        Response += "Y轴上止点开关故障，";
+                                    }
+                                    if(error1[4] == (byte)0x01){
+                                        Response += "Y轴下止点开关故障，";
+                                    }
+                                    if(error1[5] == (byte)0x01){
+                                        Response += "Y轴电机超时，";
+                                    }
+                                    if(error1[6] == (byte)0x01){
+                                        Response += "Y轴码盘故障，";
+                                    }
+                                    if(error1[7] == (byte)0x01){
+                                        Response += "Y轴出货门定位开关故障，";
+                                    }
+                                    Response += "\r\n";
+                                    Response += "电机实际动作时间（毫秒）:" + ((rec[10]&0xff) * 256 + (rec[11]&0xff)) + "\r\n";
+                                    Response += "电机最大电流（毫安）:" + ((rec[12]&0xff) * 256 + (rec[13]&0xff)) + "\r\n";
+                                    Response += "电机平均电流（毫安）:" + ((rec[14]&0xff) * 256 + (rec[15]&0xff)) + "\r\n";
+                                }
+                            }
+                        }
+                    }
+                    times = times + 1;
+                    if(times == 5){
+                        flag = false;
+                        Response = "测试通信故障";
+                        Log.w("happy", "测试通信故障");
+                    }
                 }
-                thisFloorPosition = getGeerPosition();
                 mTheMSG.setText(thisFloorPosition+ " ");
-                yMotor.setText(settingReceiveThread.Response);
+                yMotor.setText(Response);
                 break;
             case R.id.confirm_this:
                 confirmThis();
@@ -170,19 +221,16 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 confirmThis();
                 break;
             case R.id.test_activity_button:
-
                 Intent intent = new Intent(SettingActivity.this, SettingTestActivty.class);
                 startActivity(intent);
                 break;
-            case R.id.position_activity_button:
-                Intent intent1 = new Intent(SettingActivity.this, SettingPositionActivity.class);
-                startActivity(intent1);
+            case R.id.return_back_button:
+                this.finish();
+                serialPort.close();
                 break;
         }
     }
-
     public void changeCounter() {
-        settingReceiveThread.setPort(serialPort);
         counter = counter == 1 ? 2 : 1;
         if (counter == 1) {
             mNowCounter.setText(LEFTCOUNTER);
@@ -265,7 +313,4 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         mFloors.setText(str);
     }
 
-    public int getGeerPosition() {
-        return settingReceiveThread.gearPosition;
-    }
 }

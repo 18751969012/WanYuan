@@ -33,6 +33,7 @@ public class OutGoodsService extends Service {
 
         Log.w("happy", "出货主线程开启");
         Util.WriteFile("出货主线程开启");
+
     }
 
 

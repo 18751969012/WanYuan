@@ -92,11 +92,12 @@ public class Transaction {
     public String toString() {
         return "Transaction{" +
                 "_id=" + _id +
+                ", orderNO='" + orderNO + '\'' +
                 ", complete=" + complete +
                 ", type=" + type +
                 ", beginTime='" + beginTime + '\'' +
                 ", endTime='" + endTime + '\'' +
-                ", foodIDs='" + positionIDs + '\'' +
+                ", positionIDs='" + positionIDs + '\'' +
                 ", error=" + error +
                 '}';
     }

@@ -143,13 +143,11 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                     int T = 0;
                     if(i == 1){
                         if(j == 1){
-                            T = 3;
-                        }else if(j == 2){
-                            T = 4;
-                        }else if(j == 3 || j == 4 || j == 5 || j == 6){
                             T = 1;
+                        }else if(j == 2 || j == 3 || j == 4 || j == 5 || j == 6){
+                            T = 3;
                         }
-                        if((j == 3 || j == 4 || j == 5 || j == 6) && (k == 9 || k == 10)){
+                        if((j == 1) && (k == 9 || k == 10)){
                             T = 2;
                         }
                     }

@@ -312,11 +312,11 @@ public class OutGoodsThread extends Thread {
                     break;
                 }
                 case 3:{/*开落货门*/
-                    openDropGoodsDoor();
+//                    openDropGoodsDoor();
                     break;
                 }
                 case 4:{/*关落货门*/
-                    closeDropGoodsDoor();
+//                    closeDropGoodsDoor();
                     break;
                 }
                 case 5:{/*查询开取货门*/
@@ -328,11 +328,11 @@ public class OutGoodsThread extends Thread {
                     break;
                 }
                 case 7:{/*查询开落货门*/
-                    queryOpenDropGoodsDoor();
+//                    queryOpenDropGoodsDoor();
                     break;
                 }
                 case 8:{/*查询关落货门*/
-                    queryCloseDropGoodsDoor();
+//                    queryCloseDropGoodsDoor();
                     break;
                 }
             }
@@ -675,16 +675,16 @@ public class OutGoodsThread extends Thread {
      * 说明：判定通信故障后调用
      * */
     private void handleCommunicationError(){
-//        queryLastedTransaction.setComplete(1);
-//        queryLastedTransaction.setError(1);
-//        tDao.updateTransaction(queryLastedTransaction);
-//        OutGoodsThreadFlag = false;
-//        SystemClock.sleep(20);
-//        Intent intent = new Intent();
-//        intent.setAction("njust_outgoods_complete");
-//        intent.putExtra("transaction_order_number", current_transaction_order_number);
-//        intent.putExtra("outgoods_status", "fail");
-//        context.sendBroadcast(intent);
+        queryLastedTransaction.setComplete(1);
+        queryLastedTransaction.setError(1);
+        tDao.updateTransaction(queryLastedTransaction);
+        OutGoodsThreadFlag = false;
+        SystemClock.sleep(20);
+        Intent intent = new Intent();
+        intent.setAction("njust_outgoods_complete");
+        intent.putExtra("transaction_order_number", current_transaction_order_number);
+        intent.putExtra("outgoods_status", "fail");
+        context.sendBroadcast(intent);
     }
 
     /**
@@ -1662,109 +1662,12 @@ public class OutGoodsThread extends Thread {
                     if(rec[16] == (byte)0x02){
                         midZNum++;
                         closeGetGoodsDoor = true;
-                        midBoard = Constant.openDropGoodsDoor;
+                        midBoard = Constant.wait;
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
                             System.arraycopy(rec, 7, errorRec, 0, 9);
                             errorHandling(0,(byte)0x4D,errorRec);
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    private void openDropGoodsDoor(){
-        boolean flag = true;
-        int times = 0;
-        while (flag){
-            mMotorControl.openDropGoodsDoor(midZNum);
-            SystemClock.sleep(delay);
-            byte[] rec = serialPort485.receiveData();
-            if (rec != null && rec.length >= 5) {
-                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
-                    if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
-                            flag = false;
-                            midZNum++;
-                            midBoard = Constant.queryOpenDropGoodsDoor;
-                        }
-                    }
-                }
-            }
-            times = times + 1;
-            if(times == 5){
-                flag = false;
-                handleCommunicationError();
-                Log.w("happy", "中柜板通信故障");
-                Util.WriteFile("中柜板通信故障");
-            }
-        }
-    }
-
-    private void queryOpenDropGoodsDoor(){
-        mMotorControl.query((byte)0x09,(byte)0xE0,midZNum);
-        SystemClock.sleep(delay);
-        byte[] rec = serialPort485.receiveData();
-        if (rec != null && rec.length >= 5) {
-            if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
-                if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
-                    if(rec[16] == (byte)0x02){
-                        midZNum++;
-                        midBoard = Constant.closeDropGoodsDoor;
-                        if((rec[9]&0x01) != (byte)0x01){
-                            byte[] errorRec = new byte[9];
-                            System.arraycopy(rec, 7, errorRec, 0, 9);
-                            errorHandling(0,(byte)0x46,errorRec);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void closeDropGoodsDoor(){
-        boolean flag = true;
-        int times = 0;
-        while (flag){
-            mMotorControl.closeDropGoodsDoor(midZNum);
-            SystemClock.sleep(delay);
-            byte[] rec = serialPort485.receiveData();
-            if (rec != null && rec.length >= 5) {
-                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
-                    if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
-                            flag = false;
-                            midZNum++;
-                            midBoard = Constant.queryCloseDropGoodsDoor;
-                        }
-                    }
-                }
-            }
-            times = times + 1;
-            if(times == 5){
-                flag = false;
-                handleCommunicationError();
-                Log.w("happy", "中柜板通信故障");
-                Util.WriteFile("中柜板通信故障");
-            }
-        }
-    }
-
-    private void queryCloseDropGoodsDoor(){
-        mMotorControl.query((byte)0x0A,(byte)0xE0,midZNum);
-        SystemClock.sleep(delay);
-        byte[] rec = serialPort485.receiveData();
-        if (rec != null && rec.length >= 5) {
-            if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
-                if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
-                    if(rec[16] == (byte)0x02){
-                        if((rec[9]&0x01) != (byte)0x01){
-                            byte[] errorRec = new byte[9];
-                            System.arraycopy(rec, 7, errorRec, 0, 9);
-                            errorHandling(0,(byte)0x46,errorRec);
-                        }
-                        midZNum++;
                         OutGoodsThreadFlag = false;
                         serialPort485.close();
                         queryLastedTransaction.setComplete(1);
@@ -1782,6 +1685,103 @@ public class OutGoodsThread extends Thread {
             }
         }
     }
+
+//    private void openDropGoodsDoor(){
+//        boolean flag = true;
+//        int times = 0;
+//        while (flag){
+//            mMotorControl.openDropGoodsDoor(midZNum);
+//            SystemClock.sleep(delay);
+//            byte[] rec = serialPort485.receiveData();
+//            if (rec != null && rec.length >= 5) {
+//                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+//                    if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
+//                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+//                            flag = false;
+//                            midZNum++;
+//                            midBoard = Constant.queryOpenDropGoodsDoor;
+//                        }
+//                    }
+//                }
+//            }
+//            times = times + 1;
+//            if(times == 5){
+//                flag = false;
+//                handleCommunicationError();
+//                Log.w("happy", "中柜板通信故障");
+//                Util.WriteFile("中柜板通信故障");
+//            }
+//        }
+//    }
+//
+//    private void queryOpenDropGoodsDoor(){
+//        mMotorControl.query((byte)0x09,(byte)0xE0,midZNum);
+//        SystemClock.sleep(delay);
+//        byte[] rec = serialPort485.receiveData();
+//        if (rec != null && rec.length >= 5) {
+//            if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+//                if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
+//                    if(rec[16] == (byte)0x02){
+//                        midZNum++;
+//                        midBoard = Constant.closeDropGoodsDoor;
+//                        if((rec[9]&0x01) != (byte)0x01){
+//                            byte[] errorRec = new byte[9];
+//                            System.arraycopy(rec, 7, errorRec, 0, 9);
+//                            errorHandling(0,(byte)0x46,errorRec);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private void closeDropGoodsDoor(){
+//        boolean flag = true;
+//        int times = 0;
+//        while (flag){
+//            mMotorControl.closeDropGoodsDoor(midZNum);
+//            SystemClock.sleep(delay);
+//            byte[] rec = serialPort485.receiveData();
+//            if (rec != null && rec.length >= 5) {
+//                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+//                    if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
+//                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+//                            flag = false;
+//                            midZNum++;
+//                            midBoard = Constant.queryCloseDropGoodsDoor;
+//                        }
+//                    }
+//                }
+//            }
+//            times = times + 1;
+//            if(times == 5){
+//                flag = false;
+//                handleCommunicationError();
+//                Log.w("happy", "中柜板通信故障");
+//                Util.WriteFile("中柜板通信故障");
+//            }
+//        }
+//    }
+//
+//    private void queryCloseDropGoodsDoor(){
+//        mMotorControl.query((byte)0x0A,(byte)0xE0,midZNum);
+//        SystemClock.sleep(delay);
+//        byte[] rec = serialPort485.receiveData();
+//        if (rec != null && rec.length >= 5) {
+//            if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+//                if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
+//                    if(rec[16] == (byte)0x02){
+//                        if((rec[9]&0x01) != (byte)0x01){
+//                            byte[] errorRec = new byte[9];
+//                            System.arraycopy(rec, 7, errorRec, 0, 9);
+//                            errorHandling(0,(byte)0x46,errorRec);
+//                        }
+//                        midZNum++;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private void errorHandling(int counter, byte module, byte[] rec) {
         MachineStateDao machineStateDao = new MachineStateDaoImpl(context);

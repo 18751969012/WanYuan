@@ -16,7 +16,7 @@ import com.njust.major.SCM.MotorControl;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
 
-import static com.njust.major.error.errorHandling.byteTo8Byte;
+
 
 
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener {
@@ -78,12 +78,10 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         Button confirmAll = (Button) findViewById(R.id.confirm_all);
         Button manuelConfirm = (Button) findViewById(R.id.manuel_confirm_floor_no);
         Button getInTestActivty = (Button) findViewById(R.id.test_activity_button);
-        Button positionSettingButton = (Button) findViewById(R.id.position_activity_button);
         Button returnBack = (Button) findViewById(R.id.return_back_button);
 
 
         returnBack.setOnClickListener(this);
-        positionSettingButton.setOnClickListener(this);
         fastUp.setOnClickListener(this);
         slowUp.setOnClickListener(this);
         fastDown.setOnClickListener(this);
@@ -312,5 +310,16 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         str += "出口为： " + outFloorPosition;
         mFloors.setText(str);
     }
-
+    /**
+     * 将byte转换为一个长度为8的byte数组，数组每个值代表bit
+     * @param b 1个字节byte数据
+     * */
+    private static byte[] byteTo8Byte(byte b) {
+        byte[] array = new byte[8];
+        for (int i = 0; i <= 7; i++) {
+            array[i] = (byte)(b & 1);
+            b = (byte) (b >> 1);
+        }
+        return array;
+    }
 }

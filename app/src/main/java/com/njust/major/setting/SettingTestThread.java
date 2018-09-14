@@ -10,7 +10,6 @@ import com.njust.major.SCM.MotorControl;
 import static com.njust.VMApplication.midZNum;
 import static com.njust.VMApplication.rimZNum1;
 import static com.njust.VMApplication.rimZNum2;
-import static com.njust.major.error.errorHandling.byteTo8Byte;
 
 
 public class SettingTestThread extends Thread {
@@ -662,5 +661,17 @@ public class SettingTestThread extends Thread {
                     }
                 }
             }
+    }
+    /**
+     * 将byte转换为一个长度为8的byte数组，数组每个值代表bit
+     * @param b 1个字节byte数据
+     * */
+    private static byte[] byteTo8Byte(byte b) {
+        byte[] array = new byte[8];
+        for (int i = 0; i <= 7; i++) {
+            array[i] = (byte)(b & 1);
+            b = (byte) (b >> 1);
+        }
+        return array;
     }
 }

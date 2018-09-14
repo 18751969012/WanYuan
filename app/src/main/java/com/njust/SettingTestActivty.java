@@ -24,7 +24,6 @@ import java.util.TimerTask;
 
 import static com.njust.VMApplication.midZNum;
 import static com.njust.VMApplication.rimZNum1;
-import static com.njust.major.error.errorHandling.byteTo8Byte;
 
 
 public class SettingTestActivty extends AppCompatActivity implements View.OnClickListener {

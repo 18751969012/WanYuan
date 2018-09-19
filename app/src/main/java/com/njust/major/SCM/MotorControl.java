@@ -1,6 +1,7 @@
 package com.njust.major.SCM;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.njust.SerialPort;
 import com.njust.major.bean.MachineState;
@@ -10,6 +11,8 @@ import com.njust.major.dao.PositionDao;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
 import com.njust.major.dao.impl.PositionDaoImpl;
 import com.njust.major.dao.impl.TransactionDaoImpl;
+
+import java.util.Arrays;
 
 
 public class MotorControl {
@@ -44,8 +47,13 @@ public class MotorControl {
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x01;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) ((queryMachineState.getLeftFlootPosition((p1.getPosition1()/16 - 1)) >> 8) & 0xFF);
-        MotorControlTXBuf[7] = (byte) (queryMachineState.getLeftFlootPosition((p1.getPosition1()/16 - 1)) & 0xFF);
+        if(counter == 1){
+            MotorControlTXBuf[6] = (byte) ((queryMachineState.getLeftFlootPosition((p1.getPosition1()/16 - 1)) >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) (queryMachineState.getLeftFlootPosition((p1.getPosition1()/16 - 1)) & 0xFF);
+        }else{
+            MotorControlTXBuf[6] = (byte) ((queryMachineState.getRightFlootPosition((p1.getPosition1()/16 - 1)) >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) (queryMachineState.getRightFlootPosition((p1.getPosition1()/16 - 1)) & 0xFF);
+        }
         MotorControlTXBuf[8] = (byte) 0xF1;
         int sum = 0;
         for (int i = 0; i <9; i++) {
@@ -170,6 +178,8 @@ public class MotorControl {
         }
         MotorControlTXBuf[11] = (byte)(sum & 0xFF);
         motorPort.sendData(MotorControlTXBuf, 12);
+        Log.w("happy", String.valueOf(p1.getPosition1()));
+        Log.w("happy", String.valueOf(p1.getPosition2()));
     }
 
 
@@ -345,22 +355,21 @@ public class MotorControl {
      *             9=Y轴电机停转，10=X轴电机正转一周，11=X轴电机反转一周
      * */
     public void counterCommand(int counter ,int zhenNumber, int code) {
-        MotorControlTXBuf = new byte[10];
+        MotorControlTXBuf = new byte[9];
         MotorControlTXBuf[0] = (byte) 0xE2;
-        MotorControlTXBuf[1] = (byte) 0x0A;
+        MotorControlTXBuf[1] = (byte) 0x09;
         MotorControlTXBuf[2] = (byte) (0xC0+(counter-1));
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x0B;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) 0x31;
-        MotorControlTXBuf[7] = (byte) code;
-        MotorControlTXBuf[8] = (byte) 0xF1;
+        MotorControlTXBuf[6] = (byte) code;
+        MotorControlTXBuf[7] = (byte) 0xF1;
         int sum = 0;
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             sum = sum + MotorControlTXBuf[i];
         }
-        MotorControlTXBuf[9] = (byte)(sum & 0xFF);
-        motorPort.sendData(MotorControlTXBuf, 10);
+        MotorControlTXBuf[8] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 9);
     }
 
     /**
@@ -409,10 +418,10 @@ public class MotorControl {
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x0C;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) 0x39;
-        MotorControlTXBuf[7] = (byte) code;
-        MotorControlTXBuf[8] = (byte) floor;
-        MotorControlTXBuf[9] = (byte) column;
+        MotorControlTXBuf[6] = (byte) code;
+        MotorControlTXBuf[7] = (byte) floor;
+        MotorControlTXBuf[8] = (byte) column;
+        MotorControlTXBuf[9] = (byte) 0;
         MotorControlTXBuf[10] = (byte) 0xF1;
         int sum = 0;
         for (int i = 0; i < 11; i++) {

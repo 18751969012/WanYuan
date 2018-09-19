@@ -11,11 +11,11 @@ import java.io.File;
 public class VMApplication extends Application {
 	public static boolean VMMainThreadFlag = true;
 	public static boolean OutGoodsThreadFlag = false;
-	public static int rimZNum1 = 0;
-	public static int rimZNum2 = 0;
-	public static int aisleZNum1 = 0;
-	public static int aisleZNum2 = 0;
-	public static int midZNum = 0;
+	public static int rimZNum1 = 5;
+	public static int rimZNum2 = 5;
+	public static int aisleZNum1 = 5;
+	public static int aisleZNum2 = 5;
+	public static int midZNum = 5;
 	public static String current_transaction_order_number = "";
 
 	static {

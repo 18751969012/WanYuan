@@ -21,4 +21,6 @@ public interface PositionDao {
     public List<Position> queryPosition();
 
     public Position queryPosition(int PositionID, int Counter);
+
+    public int queryPositionNo(int PositionID, int Counter);
 }

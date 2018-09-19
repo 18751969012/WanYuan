@@ -36,7 +36,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
     public int counter = 1;
     private TextView mNowCounter;
     private byte zhen = 0;
-    private int delay = 100;
+    private int delay = 150;
 
     public String outFoodResponse;
     public String getFoodResponse;
@@ -132,7 +132,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         returnBack.setOnClickListener(this);
         serialPort = mSerialPort;
         motorControl = new MotorControl(serialPort, getApplicationContext());
-        settingTestThread = new SettingTestThread();
+        settingTestThread = new SettingTestThread(motorControl);
         settingTestThread.init(serialPort);
         settingTestThread.start();
         timer.schedule(timerTask, 500, 500);
@@ -144,11 +144,9 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
             case R.id.test_change_counter:
                 changeCounter();
                 break;
-
             case R.id.houdao_motor:
                 int tmpRow = Integer.parseInt(mRow.getText().toString());
                 int tmpColumn = Integer.parseInt(mColumn.getText().toString());
-                Log.i("happy", "货道测试");
                 houdao_motor(tmpRow,tmpColumn);
                 mHuoDaoMotor.setText(foodRoadResponse);
                 break;
@@ -222,7 +220,7 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             if (tmpRow != 0 && tmpColumn != 0) {
-                motorControl.pushTestCommand(counter, zhen++, 1, tmpRow, tmpColumn);
+                motorControl.pushTestCommand(counter, zhen++, 1,tmpRow, tmpColumn);
             } else if (tmpRow != 0 && tmpColumn == 0) {
                 motorControl.pushTestCommand(counter, zhen++, 2, tmpRow, tmpColumn);
             } else if (tmpRow == 0 && tmpColumn != 0) {
@@ -230,9 +228,16 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
             } else if (tmpRow == 0 && tmpColumn == 0) {
                 motorControl.pushTestCommand(counter, zhen++, 4, tmpRow, tmpColumn);
             }
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
+
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "485收到串口："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x39 && rec[3] == (byte)(0x80+(counter-1)) && rec[7] == (byte)0x50){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -259,9 +264,15 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.openGetGoodsDoor(midZNum);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -284,15 +295,21 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.closeGetGoodsDoor(midZNum);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             midZNum++;
-                            settingTestThread.openGetFoodFlag = true;
+                            settingTestThread.closeGetFoodFlag = true;
                         }
                     }
                 }
@@ -310,9 +327,15 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.openOutGoodsDoor(counter,rimZNum1);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x6F && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x5A){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -340,9 +363,15 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.closeOutGoodsDoor(counter,rimZNum1);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x63 && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x5A){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -370,9 +399,15 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.openDropGoodsDoor(midZNum);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -396,9 +431,15 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.closeDropGoodsDoor(midZNum);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -422,9 +463,15 @@ public class SettingTestActivty extends AppCompatActivity implements View.OnClic
         int times = 0;
         while (flag){
             motorControl.moveHorizontal(counter,rimZNum1,orientation,3600);
+            Log.w("happy", "发送串口");
             SystemClock.sleep(delay);
             byte[] rec = serialPort.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "发送反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x78 && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x58){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){

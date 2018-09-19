@@ -54,12 +54,14 @@ public class OutGoodsThread extends Thread {
     private TransactionDao tDao;
     private Transaction queryLastedTransaction;
     private Timer mTimer = new Timer();
+    private TimerTask timerTask;
+
 
     private static int packageCount1 = 0;//存放左右柜分别打包的个数,每三个凑成一个包，完成一次轮询出货
     private static int packageCount2 = 0;
     private int moveTime = 1200;
-    private int moveTimeOut = 3600;
-    private int delay = 150;
+    private int moveTimeOut = 4500;
+    private int delay = 110;
     private int[][] goods1;
     private int[][] goods2;
 
@@ -81,6 +83,8 @@ public class OutGoodsThread extends Thread {
     private boolean closeGetGoodsDoor = true;
     private boolean finshDone1 = false;
     private boolean finshDone2 = false;
+    private boolean pushGoods1 = false;
+    private boolean pushGoods2 = false;
 
 
     public OutGoodsThread(Context context){
@@ -346,40 +350,94 @@ public class OutGoodsThread extends Thread {
             for (int i = 1; i <= packageCount; i++) {
                 /*打包只有一件货*/
                 if ((set.length - (i - 1) * 3) == 1) {
-                    outGoods[i-1][0] = set[(i-1)*3];
-                    for(int j= 1; j<=8 ; j++){
-                        outGoods[i-1][j] = 0;
+                    int w = isWhere(counter,set[(i-1)*3]);
+                    if(w <= 3){
+                        outGoods[i-1][0] = set[(i-1)*3];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        for(int j= 3; j<=8 ; j++){
+                            outGoods[i-1][j] = 0;
+                        }
+                    }else{
+                        outGoods[i-1][0] = set[(i-1)*3];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        for(int j= 3; j<=8 ; j++){
+                            outGoods[i-1][j] = 0;
+                        }
                     }
                 }
                 /*打包两件货*/
                 else if((set.length - (i - 1) * 3) == 2){
-                    if(isWhere(counter,set[(i-1)*3]) == isWhere(counter,set[(i-1)*3+1]) && isWhere(counter,set[(i-1)*3]) <= 3){
-                        outGoods[i-1][0] = set[(i-1)*3];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
-                        outGoods[i-1][3] = set[(i-1)*3+1];
+                    /*先排序*/
+                    int sort[] = new int[2];
+                    int where[] = new int[2];
+                    where[0]=isWhere(counter,set[(i-1)*3]);
+                    where[1]=isWhere(counter,set[(i-1)*3+1]);
+                    Map<Integer, Integer> map = new TreeMap<>();
+                    map.put(0, where[0]);
+                    map.put(1, where[1]);
+                    List<Map.Entry<Integer,Integer>> list = new ArrayList<>(map.entrySet());
+                    //然后通过比较器来实现排序
+                    Collections.sort(list,new Comparator<Map.Entry<Integer,Integer>>() {
+                        public int compare(Map.Entry<Integer, Integer> o1,
+                                           Map.Entry<Integer, Integer> o2) {
+                            return o1.getValue().compareTo(o2.getValue());
+                        }
+                    });
+                    int no = 0;
+                    for(Map.Entry<Integer,Integer> mapping:list){
+                        sort[no++] = set[(i-1)*3 + mapping.getKey()];
+                    }
+                    int w1 = isWhere(counter,sort[0]);
+                    int w2 = isWhere(counter,sort[1]);
+                    if((w1==1&&w2==1) || (w1==1&&w2==3) || (w1==2&&w2==2)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime;
                         for(int j= 6; j<=8 ; j++){
                             outGoods[i-1][j] = 0;
                         }
-                    }else if(isWhere(counter,set[(i-1)*3]) == isWhere(counter,set[(i-1)*3+1]) && isWhere(counter,set[(i-1)*3]) > 3){
-                        outGoods[i-1][0] = set[(i-1)*3];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
-                        outGoods[i-1][3] = set[(i-1)*3+1];
+                    }else if((w1==4&&w2==4) || (w1==4&&w2==5) || (w1==5&&w2==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
                         outGoods[i-1][5] = moveTime;
                         for(int j= 6; j<=8 ; j++){
                             outGoods[i-1][j] = 0;
                         }
-                    }else{
-                        outGoods[i-1][0] = set[(i-1)*3];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
-                        outGoods[i-1][3] = set[(i-1)*3+1];
-                        outGoods[i-1][4] = 0;
-                        outGoods[i-1][5] = 0;
+                    }else if((w1==1&&w2==5) || (w1==1&&w2==4) || (w1==2&&w2==3) || (w1==2&&w2==5)|| (w1==3&&w2==3) || (w1==3&&w2==4)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        for(int j= 6; j<=8 ; j++){
+                            outGoods[i-1][j] = 0;
+                        }
+                    }else if((w1==1&&w2==2)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime;
+                        for(int j= 6; j<=8 ; j++){
+                            outGoods[i-1][j] = 0;
+                        }
+                    }else if((w1==3&&w2==5) || (w1==2&&w2==4) ){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
                         for(int j= 6; j<=8 ; j++){
                             outGoods[i-1][j] = 0;
                         }
@@ -409,167 +467,239 @@ public class OutGoodsThread extends Thread {
                     for(Map.Entry<Integer,Integer> mapping:list){
                         sort[no++] = set[(i-1)*3 + mapping.getKey()];
                     }
-                    /*1、2、3位置三个重叠*/
-                    if(isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == isWhere(counter,sort[2]) && isWhere(counter,sort[0]) <= 3){
+                    int w1 = isWhere(counter,sort[0]);
+                    int w2 = isWhere(counter,sort[1]);
+                    int w3 = isWhere(counter,sort[2]);
+                    if((w1==1&&w2==1&&w3==1) || (w1==1&&w2==1&&w3==4) || (w1==2&&w2==1&&w3==2)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    /*4、5位置三个重叠*/
-                    else if(isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == isWhere(counter,sort[2]) && isWhere(counter,sort[0]) > 3){
+                    }else if((w1==1&&w2==1&&w3==2)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
-                        outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 1;
-                        outGoods[i-1][5] = moveTime;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
-                        outGoods[i-1][8] = moveTime;
-                    }
-                    /*1、1、2 或2、2、3*/
-                    else if((isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 1 && isWhere(counter,sort[2]) == 2)
-                            ||(isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 2 && isWhere(counter,sort[2]) == 3)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
-                        outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime*2;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 0;
-                        outGoods[i-1][8] = 0;
-                    }
-                    /*1、1、3或1、1、4或1、1、5或2、2、4或2、2、5*/
-                    else if((isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 1 && isWhere(counter,sort[2]) > 2)
-                            ||(isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 2 && isWhere(counter,sort[2]) > 3)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
-                        outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 0;
-                        outGoods[i-1][8] = 0;
-                    }
-                    /*1、2、2*/
-                    else if(isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 2 && isWhere(counter,sort[0]) == 1){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime*2;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    /*1、3、3*/
-                    else if(isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 3 && isWhere(counter,sort[0]) == 1){
+                    }else if((w1==1&&w2==1&&w3==3) || (w1==1&&w2==2&&w3==2)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
                         outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 0;
-                        outGoods[i-1][5] = 0;
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    /*1、4、4或1、5、5*/
-                    else if((isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 4 && isWhere(counter,sort[0]) == 1)
-                            || (isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 5 && isWhere(counter,sort[0]) == 1)){
+                    }else if((w1==1&&w2==1&&w3==5)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime*3;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==2&&w3==3)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime*2;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 1;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    /*2、4、4或2、5、5*/
-                    else if((isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 4 && isWhere(counter,sort[0]) == 2)
-                            || (isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 5 && isWhere(counter,sort[0]) == 2)){
+                    }else if((w1==1&&w2==2&&w3==4) || (w1==2&&w2==3&&w3==4)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==2&&w3==5) || (w1==2&&w2==2&&w3==4) || (w1==2&&w2==3&&w3==3)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 1;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    /*2、3、3*/
-                    else if((isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 3 && isWhere(counter,sort[0]) == 2)){
+                    }else if((w1==1&&w2==3&&w3==3)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime*2;
                         outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 0;
-                        outGoods[i-1][8] = 0;
-                    }
-                    /*3、3、4或3、3、5*/
-                    else if((isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 3 && isWhere(counter,sort[2]) == 4)
-                            ||(isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 3 && isWhere(counter,sort[2]) == 5)){
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==3&&w3==4)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*3;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
                         outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 0;
-                        outGoods[i-1][8] = 0;
-                    }
-                    /*3、4、4或3、5、5*/
-                    else if((isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 4 && isWhere(counter,sort[0]) == 3)
-                            ||(isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 5 && isWhere(counter,sort[0]) == 3)){
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==3&&w3==5) || (w1==1&&w2==4&&w3==4) || (w1==2&&w2==2&&w3==5) || (w1==3&&w2==3&&w3==3)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 0;
-                        outGoods[i-1][5] = 0;
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 1;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    /*4、4、5或4、5、5*/
-                    else if((isWhere(counter,sort[0]) == isWhere(counter,sort[1]) && isWhere(counter,sort[0]) == 4 && isWhere(counter,sort[2]) == 5)
-                            ||(isWhere(counter,sort[1]) == isWhere(counter,sort[2]) && isWhere(counter,sort[1]) == 5 && isWhere(counter,sort[0]) == 4)){
+                    }else if((w1==1&&w2==5&&w3==5)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*3;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
                         outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 1;
                         outGoods[i-1][8] = moveTime;
-                    }
-                    else{
+                    }else if((w1==2&&w2==2&&w3==3)){
                         outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 0;
-                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 0;
-                        outGoods[i-1][5] = 0;
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime*2;
                         outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 0;
-                        outGoods[i-1][8] = 0;
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==2&&w2==4&&w3==4) || (w1==3&&w2==3&&w3==4)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==2&&w2==5&&w3==5) || (w1==3&&w2==4&&w3==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==3&&w2==3&&w3==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==3&&w2==4&&w3==4)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==3&&w2==5&&w3==5) || (w1==4&&w2==4&&w3==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==4&&w2==4&&w3==4)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==5&&w2==5&&w3==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==2&&w2==4&&w3==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[2];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][6] = sort[1];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==4&&w3==5)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime*3;
+                        outGoods[i-1][3] = sort[2];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][6] = sort[1];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==2&&w2==3&&w3==5)){
+                        outGoods[i-1][0] = sort[1];
+                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[2];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==4&&w2==5&&w3==5)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
                     }
                 }
             }
@@ -586,38 +716,82 @@ public class OutGoodsThread extends Thread {
         int row2 = p.getPosition2() % 16;
         switch (p.getMotorType()) {
             case 4:
-                where = row1;
+                if(pDao.queryPositionNo(positionID ,counter) <= 4){
+                    if(row1<=2){
+                        where = row1;
+                    }else if(row1 == 3){
+                        where = 4;
+                    }else if(row1 == 4){
+                        where = 5;
+                    }
+                }else {
+                    where = row1;
+                }
                 break;
             case 3:
                 where = row1 % 2 == 0 ? row1 / 2 : (row1 / 2 + 1);
                 break;
             case 2:
-                if (counter == 1) {
-                    where = row1 / 2;
-                } else {
+                if(pDao.queryPositionNo(positionID ,counter) == 6 && pDao.queryPosition((positionID-1)/10 * 10+1 ,counter).getMotorType() == 2 && pDao.queryPosition((positionID-1)/10 * 10+6 ,counter).getMotorType() == 2){
+                    if(row1<=3){
+                        where = row1;
+                    }else if(row1>=4){
+                        where = row1-1;
+                    }
+                }else if(pDao.queryPositionNo(positionID ,counter) == 10){
+                    if (counter == 1) {
+                        where = row1 / 2;
+                    } else {
+                        where = row1 / 2 + 1;
+                    }
+                }else if(pDao.queryPositionNo(positionID ,counter) == 8){
                     where = row1 / 2 + 1;
+                }else{
+                    if (counter == 1) {
+                        where = row1 / 2;
+                    } else {
+                        where = row1 / 2 + 1;
+                    }
                 }
                 break;
             case 1:
-                if (counter == 1) {
-                    if (row1 == 1 || row1 == 2) {
-                        where = 1;
-                    } else if (row1 == 3 || row1 == 4 || row1 == 5) {
-                        where = 2;
-                    } else if (row1 == 6 || row1 == 7) {
-                        where = 3;
-                    } else if (row1 == 8) {
-                        where = 4;
+                if(pDao.queryPositionNo(positionID ,counter) == 8){
+                    if (counter == 1) {
+                        if (row1 == 1 || row1 == 2) {
+                            where = 1;
+                        } else if (row1 == 3 || row1 == 4) {
+                            where = 2;
+                        } else if (row1 == 5 || row1 == 6) {
+                            where = 3;
+                        }
+                    } else {
+                        if (row1 == 3 || row1 == 4) {
+                            where = 3;
+                        } else if (row1 == 5 || row1 == 6) {
+                            where = 4;
+                        } else if (row1 == 7 || row1 == 8) {
+                            where = 5;
+                        }
                     }
-                } else {
-                    if (row2 == 9 || row2 == 10) {
-                        where = 5;
-                    } else if (row2 == 6 || row2 == 7 || row2 == 8) {
-                        where = 4;
-                    } else if (row2 == 4 || row2 == 5) {
-                        where = 3;
-                    } else if (row2 == 3) {
-                        where = 2;
+                }else if(pDao.queryPositionNo(positionID ,counter) == 10){
+                    if (counter == 1) {
+                        if (row1 == 1 || row1 == 2) {
+                            where = 1;
+                        } else if (row1 == 3 || row1 == 4) {
+                            where = 2;
+                        } else if (row1 == 5 || row1 == 6) {
+                            where = 3;
+                        } else if (row1 == 7 || row1 == 8) {
+                            where = 4;
+                        }
+                    } else {
+                        if (row1 == 3 || row1 == 4 || row1 == 5) {
+                            where = 3;
+                        } else if (row1 == 6 || row1 == 7 || row1 == 8) {
+                            where = 4;
+                        } else if (row1 == 9 || row1 == 10) {
+                            where = 5;
+                        }
                     }
                 }
                 break;
@@ -701,14 +875,14 @@ public class OutGoodsThread extends Thread {
     }
 
     private void timeStart(){
-        TimerTask timerTask = new TimerTask() {
+        if(timerTask != null){
+            timerTask.cancel();
+            timerTask = null;
+        }
+        timerTask = new TimerTask() {
             @Override
             public void run() {
                 midBoard = Constant.closeGetGoodsDoor;
-                if (mTimer != null) {
-                    mTimer.cancel();
-                    mTimer = null;
-                }
             }
         };
         mTimer.schedule(timerTask,1000);
@@ -719,10 +893,17 @@ public class OutGoodsThread extends Thread {
         boolean flag = true;
         int times = 0;
         while (flag){
+            Log.w("happy", "发送移层");
             mMotorControl.moveFloor(1,rimZNum1,goods1[currentPackageCount1][currentOutCount1*3]);
+
             SystemClock.sleep(delay);
             byte[] rec = serialPort485.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "移层反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
                         if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
@@ -745,9 +926,15 @@ public class OutGoodsThread extends Thread {
 
     private void queryMoveFloor1(){
         mMotorControl.query((byte)0x01,(byte)0xC0,rimZNum1);
+        Log.w("happy", "移层查询");
         SystemClock.sleep(delay);
         byte[] rec = serialPort485.receiveData();
         if (rec != null && rec.length >= 5) {
+            StringBuilder str1 = new StringBuilder();
+            for (byte aRec : rec) {
+                str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+            }
+            Log.w("happy", "移层查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
                     if(rec[18] == (byte)0x02){
@@ -820,13 +1007,21 @@ public class OutGoodsThread extends Thread {
         int times = 0;
         while (flag){
             mMotorControl.pushGoods(1,aisleZNum1,goods1[currentPackageCount1][currentOutCount1*3]);
+            Log.w("happy", "发送推货");
             SystemClock.sleep(delay);
             byte[] rec = serialPort485.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "推货反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x70 && rec[3] == (byte)0x80 && rec[7] == (byte)0x50){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
+                            pushGoods1 = false;
+                            rimBoard1 = Constant.moveHorizontal;
                             aisleBoard1 = Constant.queryPushGoods;
                             aisleZNum1++;
                         }
@@ -845,29 +1040,21 @@ public class OutGoodsThread extends Thread {
 
     private void queryPushGoods1(){
         mMotorControl.query((byte)0x03,(byte)0x80,aisleZNum1);
+        Log.w("happy", "推货查询");
         SystemClock.sleep(delay);
         byte[] rec = serialPort485.receiveData();
         if (rec != null && rec.length >= 5) {
+            StringBuilder str1 = new StringBuilder();
+            for (byte aRec : rec) {
+                str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+            }
+            Log.w("happy", "推货查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x70 && rec[3] == (byte)0x80 && rec[7] == (byte)0x50){
                     if(rec[16] == (byte)0x02){
                         aisleBoard1 = Constant.wait;
+                        pushGoods1 = true;
                         aisleZNum1++;
-                        currentOutCount1 = currentOutCount1 + 1;
-                        if(currentOutCount1 == 3 || goods1[currentPackageCount1][currentOutCount1*3] == 0){
-                            currentOutCount1 = 0;
-                            rimBoard1 = Constant.moveFloorOut;
-                        }else{
-                            if(goods1[currentPackageCount1][currentOutCount1*3+1] == 0){
-                                if(((goods1[currentPackageCount1][(currentOutCount1-1)*3]-1)/10) == ((goods1[currentPackageCount1][currentOutCount1*3]-1)/10)){
-                                    aisleBoard1 = Constant.pushGoods;
-                                }else{
-                                    rimBoard1 = Constant.moveFloor;
-                                }
-                            }else{
-                                rimBoard1 = Constant.moveHorizontal;
-                            }
-                        }
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
                             System.arraycopy(rec, 7, errorRec, 0, 9);
@@ -891,6 +1078,8 @@ public class OutGoodsThread extends Thread {
                     if(rec[6] == (byte)0x70 && rec[3] == (byte)0x81 && rec[7] == (byte)0x50){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
+                            pushGoods2 = false;
+                            rimBoard2 = Constant.moveHorizontal;
                             aisleBoard2 = Constant.queryPushGoods;
                             aisleZNum2++;
                         }
@@ -916,22 +1105,8 @@ public class OutGoodsThread extends Thread {
                 if(rec[6] == (byte)0x70 && rec[3] == (byte)0x81 && rec[7] == (byte)0x50){
                     if(rec[16] == (byte)0x02){
                         aisleBoard2 = Constant.wait;
+                        pushGoods2 = true;
                         aisleZNum2++;
-                        currentOutCount2 = currentOutCount2 + 1;
-                        if(currentOutCount2 == 3 || goods2[currentPackageCount2][currentOutCount2*3] == 0){
-                            currentOutCount2 = 0;
-                            rimBoard2 = Constant.moveFloorOut;
-                        }else{
-                            if(goods2[currentPackageCount2][currentOutCount2*3+1] == 0){
-                                if(((goods2[currentPackageCount2][(currentOutCount2-1)*3]-1)/10) == ((goods2[currentPackageCount2][currentOutCount2*3]-1)/10)){
-                                    aisleBoard2 = Constant.pushGoods;
-                                }else{
-                                    rimBoard2 = Constant.moveFloor;
-                                }
-                            }else{
-                                rimBoard2 = Constant.moveHorizontal;
-                            }
-                        }
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
                             System.arraycopy(rec, 7, errorRec, 0, 9);
@@ -981,11 +1156,22 @@ public class OutGoodsThread extends Thread {
                     if(rec[16] == (byte)0x02){
                         rimBoard1 = Constant.wait;
                         rimZNum1++;
-                        if(((goods1[currentPackageCount1][(currentOutCount1-1)*3]-1)/10) == ((goods1[currentPackageCount1][currentOutCount1*3]-1)/10)){
-                            aisleBoard1 = Constant.pushGoods;
+                        if(pushGoods1){
+                            currentOutCount1 = currentOutCount1 + 1;
+                            if(currentOutCount1 == 3 || goods1[currentPackageCount1][currentOutCount1*3] == 0){
+                                currentOutCount1 = 0;
+                                rimBoard1 = Constant.moveFloorOut;
+                            }else{
+                                if(((goods1[currentPackageCount1][(currentOutCount1-1)*3]-1)/10) == ((goods1[currentPackageCount1][currentOutCount1*3]-1)/10)){
+                                    aisleBoard1 = Constant.pushGoods;
+                                }else{
+                                    rimBoard1 = Constant.moveFloor;
+                                }
+                            }
                         }else{
-                            rimBoard1 = Constant.moveFloor;
+                            rimBoard1 = Constant.moveHorizontal;
                         }
+
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
                             System.arraycopy(rec, 7, errorRec, 0, 9);
@@ -1035,10 +1221,20 @@ public class OutGoodsThread extends Thread {
                     if(rec[16] == (byte)0x02){
                         rimBoard2 = Constant.wait;
                         rimZNum2++;
-                        if(((goods2[currentPackageCount2][(currentOutCount2-1)*3]-1)/10) == ((goods2[currentPackageCount2][currentOutCount2*3]-1)/10)){
-                            aisleBoard2 = Constant.pushGoods;
+                        if(pushGoods2){
+                            currentOutCount2 = currentOutCount2 + 1;
+                            if(currentOutCount2 == 3 || goods2[currentPackageCount2][currentOutCount2*3] == 0){
+                                currentOutCount2 = 0;
+                                rimBoard2 = Constant.moveFloorOut;
+                            }else{
+                                if(((goods2[currentPackageCount2][(currentOutCount2-1)*3]-1)/10) == ((goods2[currentPackageCount2][currentOutCount2*3]-1)/10)){
+                                    aisleBoard2 = Constant.pushGoods;
+                                }else{
+                                    rimBoard2 = Constant.moveFloor;
+                                }
+                            }
                         }else{
-                            rimBoard2 = Constant.moveFloor;
+                            rimBoard2 = Constant.moveHorizontal;
                         }
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
@@ -1361,6 +1557,11 @@ public class OutGoodsThread extends Thread {
             SystemClock.sleep(delay);
             byte[] rec = serialPort485.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "关出货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x63 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x5A){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -1386,6 +1587,11 @@ public class OutGoodsThread extends Thread {
         SystemClock.sleep(delay);
         byte[] rec = serialPort485.receiveData();
         if (rec != null && rec.length >= 5) {
+            StringBuilder str1 = new StringBuilder();
+            for (byte aRec : rec) {
+                str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+            }
+            Log.w("happy", "关出货门查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x63 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x5A){
                     if(rec[16] == (byte)0x02){
@@ -1581,6 +1787,11 @@ public class OutGoodsThread extends Thread {
             SystemClock.sleep(delay);
             byte[] rec = serialPort485.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "开取货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -1607,6 +1818,11 @@ public class OutGoodsThread extends Thread {
         SystemClock.sleep(delay);
         byte[] rec = serialPort485.receiveData();
         if (rec != null && rec.length >= 5) {
+            StringBuilder str1 = new StringBuilder();
+            for (byte aRec : rec) {
+                str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+            }
+            Log.w("happy", "开取货门查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                     if(rec[16] == (byte)0x02){
@@ -1632,6 +1848,11 @@ public class OutGoodsThread extends Thread {
             SystemClock.sleep(delay);
             byte[] rec = serialPort485.receiveData();
             if (rec != null && rec.length >= 5) {
+                StringBuilder str1 = new StringBuilder();
+                for (byte aRec : rec) {
+                    str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                }
+                Log.w("happy", "关取货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                         if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -1657,29 +1878,39 @@ public class OutGoodsThread extends Thread {
         SystemClock.sleep(delay);
         byte[] rec = serialPort485.receiveData();
         if (rec != null && rec.length >= 5) {
+            StringBuilder str1 = new StringBuilder();
+            for (byte aRec : rec) {
+                str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+            }
+            Log.w("happy", "关取货门查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                     if(rec[16] == (byte)0x02){
-                        midZNum++;
-                        closeGetGoodsDoor = true;
-                        midBoard = Constant.wait;
-                        if((rec[9]&0x01) != (byte)0x01){
-                            byte[] errorRec = new byte[9];
-                            System.arraycopy(rec, 7, errorRec, 0, 9);
-                            errorHandling(0,(byte)0x4D,errorRec);
+                        if((rec[8]&0x04) == (byte)0x04) {
+                            midZNum++;
+                            midBoard = Constant.openGetGoodsDoor;
+                        }else{
+                            midZNum++;
+                            closeGetGoodsDoor = true;
+                            midBoard = Constant.wait;
+                            if((rec[9]&0x01) != (byte)0x01){
+                                byte[] errorRec = new byte[9];
+                                System.arraycopy(rec, 7, errorRec, 0, 9);
+                                errorHandling(0,(byte)0x4D,errorRec);
+                            }
+                            OutGoodsThreadFlag = false;
+                            serialPort485.close();
+                            queryLastedTransaction.setComplete(1);
+                            queryLastedTransaction.setError(0);
+                            tDao.updateTransaction(queryLastedTransaction);
+                            SystemClock.sleep(20);
+                            Intent intent = new Intent();
+                            intent.setAction("njust_outgoods_complete");
+                            intent.putExtra("transaction_order_number", current_transaction_order_number);
+                            intent.putExtra("outgoods_status", "success");
+                            context.sendBroadcast(intent);
+                            Log.w("happy", "本次交易完毕");Util.WriteFile("本次交易完毕");
                         }
-                        OutGoodsThreadFlag = false;
-                        serialPort485.close();
-                        queryLastedTransaction.setComplete(1);
-                        queryLastedTransaction.setError(0);
-                        tDao.updateTransaction(queryLastedTransaction);
-                        SystemClock.sleep(20);
-                        Intent intent = new Intent();
-                        intent.setAction("njust_outgoods_complete");
-                        intent.putExtra("transaction_order_number", current_transaction_order_number);
-                        intent.putExtra("outgoods_status", "success");
-                        context.sendBroadcast(intent);
-                        Log.w("happy", "本次交易完毕");Util.WriteFile("本次交易完毕");
                     }
                 }
             }

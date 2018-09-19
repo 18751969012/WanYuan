@@ -3,6 +3,7 @@ package com.njust.major.thread;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.njust.SerialPort;
@@ -30,39 +31,43 @@ import static com.njust.VMApplication.midZNum;
 public class VMMainThread extends Thread {
     private Context context;
     private SerialPort serialPort485;
-    private SimpleDateFormat sdf;
-    private byte[] RxBuff;
     private MotorControl motorControl;
-    int[] state = new int[32];
-
-    private boolean foodOutFlag = false;
-
-    private boolean mQueryFlag = false; //是否查询机器状态
     private MachineStateDao mDao;
     private MachineState machineState;
-    private MachineState tmpMachineState;
+    private byte[] rec;
+    private int[] state = new int[32];
+    private int delay = 110;
+    private int oldMidLight = 0;//0=关灯1=开灯
+    private int oldLeftLight = 0;
+    private int oldRightLight = 0;
+    private int oldleftHeat = 0;//0=关1=开
+    private int oldRightHeat = 0;
+    private int oldLeftTempState = 0;//左柜温控模式：0=制冷1=制热2=常温
+    private int oldLeftSetTemp = 0;//左柜温度  -20～70
+    private int oldRightTempState = 0;//右柜温控模式：0=制冷1=制热2=常温
+    private int oldRightSetTemp = 0;//右柜温度  -20～70
+    private int oldLeftDoor = 0;//0=关门1=开门
+    private int oldRightDoor = 0;
+    private int oldMidDoor = 0;
+
+
+    private boolean mQueryFlag = false; //是否查询机器状态
     private boolean changeStateFlag; //是否给下位机下发指令
+
+
 
     public VMMainThread(Context context) {
         super();
         this.context = context;
         serialPort485 = new SerialPort(1, 38400, 8, 'n', 1);
         motorControl = new MotorControl(serialPort485, context);
-        PositionDao pDao = new PositionDaoImpl(context);
-        TransactionDao tDao = new TransactionDaoImpl(context);
         mDao = new MachineStateDaoImpl(context);
         machineState = mDao.queryMachineState();
-        tmpMachineState = machineState;
         changeStateFlag = false;
-        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     }
 
     private class VMContentObserve extends ContentObserver {
-        /**
-         * Creates a content observer.
-         *
-         * @param handler The handler to run {@link #onChange} on, or null if none.
-         */
+
         public VMContentObserve(Handler handler) {
             super(handler);
         }
@@ -89,145 +94,187 @@ public class VMMainThread extends Thread {
         while (true) {
             if (VMMainThreadFlag) {
                 if (mQueryFlag) {
+                    machineState = mDao.queryMachineState();
                     motorControl.counterQuery(1,rimZNum1++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
-                    for (int i = 0; i < 5; i++) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        byte[] rec = serialPort485.receiveData();
-                        if (rec != null) {
-                            if (rec.length>10 && rec[6] == 0x62) {
-                                state[0] = rec[7] * 256 + rec[8]; //压缩机温度，有符号数，0xEFFF=故障
-                                state[1] = rec[9] * 256 + rec[10];//边柜温度，有符号数，0xEFFF=故障
-                                state[2] = rec[11] * 256 + rec[12];//边柜顶部温度，有符号数，0xEFFF=故障
-                                state[3] = rec[13];//压缩机直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-                                state[4] = rec[14];//边柜直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-                                state[5] = rec[15];//门开关状态，0=关门，1=开门
-                                state[6] = rec[16];//湿度测量值，%RH
-                                state[7] = rec[17];//边柜门加热状态，0=关，1=开
-                                state[8] = rec[18];//照明灯状态，0=关，1=开
-                                state[9] = rec[19];//下货光栅状态，0=正常，1=故障
-                                state[10] = rec[20];//X轴出货光栅状态，0=正常，1=故障
-                                state[11] = rec[21] * 256 + rec[22];//备用字节
+                    SystemClock.sleep(delay);
+                    rec = serialPort485.receiveData();
+                    if (rec != null && rec.length>10) {
+                        if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                            if(rec[6] == (byte)0x65 && rec[3] == (byte)0xC0) {
+                                if(rec[7] == (byte)0xEF && rec[8] == (byte)0xFF){//压缩机温度，有符号数，0xEFFF=故障
+                                    state[0] = 22222;
+                                }else{
+                                    state[0] = (short) (rec[7] << 8 | rec[8]);
+                                }
+                                if(rec[9] == (byte)0xEF && rec[10] == (byte)0xFF){//边柜温度，有符号数，0xEFFF=故障
+                                    state[1] = 22222;
+                                }else{
+                                    state[1] = (short) (rec[9] << 8 | rec[10]);
+                                }
+                                if(rec[11] == (byte)0xEF && rec[12] == (byte)0xFF){//边柜顶部温度，有符号数，0xEFFF=故障
+                                    state[2] = 22222;
+                                }else{
+                                    state[2] = (short) (rec[11] << 8 | rec[12]);
+                                }
+                                state[3] = rec[13]==(byte)0x11? 2:(int)rec[13];//压缩机直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
+                                state[4] = rec[14]==(byte)0x11? 2:(int)rec[14];//边柜直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
+                                state[5] = (int)rec[15];//门开关状态，0=关门，1=开门
+                                state[6] = (int)rec[16];//湿度测量值，%RH
+                                state[7] = (int)rec[17];//边柜门加热状态，0=关，1=开
+                                state[8] = (int)rec[18];//照明灯状态，0=关，1=开
+                                state[9] = (int)rec[19];//下货光栅状态，0=正常，1=故障
+                                state[10] = (int)rec[20];//X轴出货光栅状态，0=正常，1=故障
+                                state[11] = (int)rec[21];//出货门开关状态，0=关，1=开，2=半开半关
+                                machineState.setLeftCompressorTemp(state[0]);
+                                machineState.setLeftCabinetTemp(state[1]);
+                                machineState.setLeftCabinetTopTemp(state[2]);
+                                machineState.setLeftCompressorDCfanState(state[3]);
+                                machineState.setLeftCabinetDCfanState(state[4]);
+                                machineState.setLeftDoor(state[5]);
+                                machineState.setLeftHumidity(state[6]);
+                                machineState.setLeftDoorheat(state[7]);
+                                machineState.setLeftLight(state[8]);
+                                machineState.setLeftPushGoodsRaster(state[9]);
+                                machineState.setLeftOutGoodsRaster(state[10]);
+                                machineState.setLeftOutGoodsDoor(state[11]);
+                                mDao.updateMachineState(machineState);
                                 break;
                             }
                         }
+                    }
 
-                    }
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     motorControl.counterQuery(2, rimZNum2++, machineState.getRightTempState(), machineState.getRightSetTemp());
-                    for (int i = 0; i < 5; i++) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        byte[] rec = serialPort485.receiveData();
-                        if (rec != null) {
-                            if (rec.length>10 && rec[6] == 0x62) {
-                                state[12] = rec[7] * 256 + rec[8];//压缩机温度，有符号数，0xEFFF=故障
-                                state[13] = rec[9] * 256 + rec[10];//边柜温度，有符号数，0xEFFF=故障
-                                state[14] = rec[11] * 256 + rec[12];//边柜顶部温度，有符号数，0xEFFF=故障
-                                state[15] = rec[13];//压缩机直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-                                state[16] = rec[14];//边柜直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-                                state[17] = rec[15];//门开关状态，0=关门，1=开门
-                                state[18] = rec[16];//湿度测量值，%RH
-                                state[19] = rec[17];//边柜门加热状态，0=关，1=开
-                                state[20] = rec[18];//照明灯状态，0=关，1=开
-                                state[21] = rec[19];//下货光栅状态，0=正常，1=故障
-                                state[22] = rec[20];//X轴出货光栅状态，0=正常，1=故障
-                                state[23] = rec[21] * 256 + rec[22];//备用字节
+                    SystemClock.sleep(delay);
+                    rec = serialPort485.receiveData();
+                    if (rec != null && rec.length>10) {
+                        if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                            if(rec[6] == (byte)0x65 && rec[3] == (byte)0xC1) {
+                                if (rec[7] == (byte) 0xEF && rec[8] == (byte) 0xFF) {//压缩机温度，有符号数，0xEFFF=故障
+                                    state[12] = 22222;
+                                } else {
+                                    state[12] = (short) (rec[7] << 8 | rec[8]);
+                                }
+                                if (rec[9] == (byte) 0xEF && rec[10] == (byte) 0xFF) {//边柜温度，有符号数，0xEFFF=故障
+                                    state[13] = 22222;
+                                } else {
+                                    state[13] = (short) (rec[9] << 8 | rec[10]);
+                                }
+                                if (rec[11] == (byte) 0xEF && rec[12] == (byte) 0xFF) {//边柜顶部温度，有符号数，0xEFFF=故障
+                                    state[14] = 22222;
+                                } else {
+                                    state[14] = (short) (rec[11] << 8 | rec[12]);
+                                }
+                                state[15] = rec[13] == (byte) 0x11 ? 2 : (int) rec[13];//压缩机直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
+                                state[16] = rec[14] == (byte) 0x11 ? 2 : (int) rec[14];//边柜直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
+                                state[17] = (int) rec[15];//门开关状态，0=关门，1=开门
+                                state[18] = (int) rec[16];//湿度测量值，%RH
+                                state[19] = (int) rec[17];//边柜门加热状态，0=关，1=开
+                                state[20] = (int) rec[18];//照明灯状态，0=关，1=开
+                                state[21] = (int) rec[19];//下货光栅状态，0=正常，1=故障
+                                state[22] = (int) rec[20];//X轴出货光栅状态，0=正常，1=故障
+                                state[23] = (int) rec[21];//出货门开关状态，0=关，1=开，2=半开半关
+                                machineState.setRightCompressorTemp(state[12]);
+                                machineState.setRightCabinetTemp(state[13]);
+                                machineState.setRightCabinetTopTemp(state[14]);
+                                machineState.setRightCompressorDCfanState(state[15]);
+                                machineState.setRightCabinetDCfanState(state[16]);
+                                machineState.setRightDoor(state[17]);
+                                machineState.setRightHumidity(state[18]);
+                                machineState.setRightDoorheat(state[19]);
+                                machineState.setRightLight(state[20]);
+                                machineState.setRightPushGoodsRaster(state[21]);
+                                machineState.setRightOutGoodsRaster(state[22]);
+                                machineState.setRightOutGoodsDoor(state[23]);
+                                mDao.updateMachineState(machineState);
                                 break;
                             }
                         }
                     }
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
                     motorControl.centerQuery(midZNum++);
-                    for (int i = 0; i < 5; i++) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        byte[] rec = serialPort485.receiveData();
-                        if (rec != null) {
-                            if (rec.length>10 && rec[6] == 0x6D) {
-                                state[26] = rec[7];//照明灯状态，0=关，1=开
-                                state[27] = rec[8];//门锁状态，0=上锁，1=开锁
-                                state[28] = rec[9];//取货光栅状态，0=正常，1=故障
-                                state[29] = rec[10];//落货光栅状态，0=正常，1=故障
-                                state[30] = rec[11];//防夹手光栅状态，0=正常，1=故障
-                                state[31] = rec[12] * 256 + rec[13];//备用字节
+                    SystemClock.sleep(delay);
+                    rec = serialPort485.receiveData();
+                    if (rec != null && rec.length>10) {
+                        if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
+                            if(rec[6] == (byte)0x6D && rec[3] == (byte)0xE0) {
+                                state[24] = (int)rec[7];//照明灯状态，0=关，1=开
+                                state[25] = (int)rec[8];//门锁状态，0=上锁，1=开锁
+                                state[26] = (int)rec[9];//门开关状态，0=关门，1=开门
+                                state[27] = (int)rec[10];//取货光栅状态，0=正常，1=故障
+                                state[28] = (int)rec[11];//落货光栅状态，0=正常，1=故障
+                                state[29] = (int)rec[12];//防夹手光栅状态，0=正常，1=故障
+                                state[30] = (int)rec[13];//取货门开关状态，0=关，1=开，2=半开半关
+                                state[31] = (int)rec[14];//落货门开关状态，0=关，1=开，2=半开半关
+                                machineState.setMidLight(state[24]);
+                                machineState.setMidDoorLock(state[25]);
+                                machineState.setMidDoor(state[26]);
+                                machineState.setMidGetGoodsRaster(state[27]);
+                                machineState.setMidDropGoodsRaster(state[28]);
+                                machineState.setMidAntiPinchHandRaster(state[29]);
+                                machineState.setMidGetDoor(state[30]);
+                                machineState.setMidDropDoor(state[31]);
+                                mDao.updateMachineState(machineState);
                                 break;
                             }
                         }
                     }
-                    saveAndBroadcastmsg();
+
+                    if(oldMidDoor != machineState.getMidDoor()){//中柜门
+                        if(machineState.getMidDoor() == 1){//开门
+
+                        }else{//关门
+
+                        }
+                        oldMidDoor = machineState.getMidDoor();
+                    }
 
                 }
                 if (changeStateFlag) {
-                    motorControl.counterCommand(1, rimZNum1++, machineState.getLeftLight() == 1 ? 1 : 2);
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(oldLeftLight != machineState.getLeftLight()){
+                        motorControl.counterCommand(1, rimZNum1++, machineState.getLeftLight() == 1 ? 1 : 2);
+                        oldLeftLight = machineState.getLeftLight();
+                        SystemClock.sleep(delay);
                     }
-                    motorControl.counterCommand(2, rimZNum2++, machineState.getRightLight() == 1 ? 1 : 2);
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(oldRightLight != machineState.getRightLight()){
+                        motorControl.counterCommand(2, rimZNum2++, machineState.getRightLight() == 1 ? 1 : 2);
+                        oldRightLight = machineState.getRightLight();
+                        SystemClock.sleep(delay);
                     }
-                    motorControl.counterCommand(1, rimZNum1++, machineState.getLeftDoorheat() == 1 ? 3 : 4);
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(oldMidLight != machineState.getMidLight()){
+                        motorControl.centerCommand(midZNum++, machineState.getMidLight() == 1 ? 1 : 2);
+                        oldMidLight = machineState.getMidLight();
+                        SystemClock.sleep(delay);
                     }
-                    motorControl.counterCommand(2, rimZNum2++, machineState.getRightDoorheat() == 1 ? 3 : 4);
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(oldleftHeat != machineState.getLeftDoorheat()){
+                        motorControl.counterCommand(1, rimZNum1++, machineState.getLeftDoorheat() == 1 ? 3 : 4);
+                        oldleftHeat = machineState.getLeftDoorheat();
+                        SystemClock.sleep(delay);
                     }
-                    motorControl.centerCommand(midZNum++, machineState.getMidLight() == 1 ? 1 : 2);
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(oldRightHeat != machineState.getRightDoorheat()){
+                        motorControl.counterCommand(2, rimZNum2++, machineState.getRightDoorheat() == 1 ? 3 : 4);
+                        oldRightHeat = machineState.getRightDoorheat();
+                        SystemClock.sleep(delay);
                     }
-                    motorControl.counterQuery(1, rimZNum1++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(oldLeftTempState != machineState.getLeftTempState() || oldLeftSetTemp != machineState.getLeftSetTemp()){
+                        motorControl.counterQuery(1, rimZNum1++, machineState.getLeftTempState(), machineState.getLeftSetTemp());
+                        oldLeftTempState = machineState.getLeftTempState();
+                        oldLeftSetTemp = machineState.getLeftSetTemp();
+                        SystemClock.sleep(delay);
                     }
-                    motorControl.counterQuery(2, rimZNum2++, machineState.getRightTempState(), machineState.getRightSetTemp());
-                    tmpMachineState = machineState;
-
+                    if(oldRightTempState != machineState.getRightTempState() || oldRightSetTemp != machineState.getRightSetTemp()){
+                        motorControl.counterQuery(2, rimZNum2++, machineState.getRightTempState(), machineState.getRightSetTemp());
+                        oldRightTempState = machineState.getRightTempState();
+                        oldRightSetTemp = machineState.getRightSetTemp();
+                        SystemClock.sleep(delay);
+                    }
                     changeStateFlag = false;
                     mQueryFlag = true;
-
                 }
-
             }
             updateZhen();
         }
     }
 
-    public void saveAndBroadcastmsg(){
-
-    }
     private void updateZhen(){
         if (rimZNum1 >= 256) {
             rimZNum1 = 0;

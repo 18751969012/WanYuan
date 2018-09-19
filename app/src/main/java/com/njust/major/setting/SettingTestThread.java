@@ -2,6 +2,7 @@ package com.njust.major.setting;
 
 
 import android.os.SystemClock;
+import android.util.Log;
 
 
 import com.njust.SerialPort;
@@ -42,8 +43,8 @@ public class SettingTestThread extends Thread {
     private int delay =150;
 
 
-    public SettingTestThread() {
-
+    public SettingTestThread(MotorControl motorControl) {
+        this.mMotorControl = motorControl;
     }
 
     public void init(SerialPort serialPort) {
@@ -58,13 +59,18 @@ public class SettingTestThread extends Thread {
     public void run() {
         super.run();
             while (sendflag) {
-                if(foodRoadFlag1){
+                while (foodRoadFlag1){
                     mMotorControl.query((byte)0x0C,(byte)0x80,rimZNum1);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
-                            if(rec[6] == (byte)0x39 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x50){
+                            if(rec[6] == (byte)0x70 && rec[3] == (byte)0x80 && rec[7] == (byte)0x50){
                                 if(rec[16] == (byte)0x02){
                                     rimZNum1++;
                                     foodRoadFlag1 = false;
@@ -106,11 +112,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(openGetFoodFlag){
+                while(openGetFoodFlag){
                     mMotorControl.query((byte)0x07,(byte)0xE0,midZNum);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                                 if(rec[16] == (byte)0x02){
@@ -168,11 +179,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(closeGetFoodFlag){
+                while(closeGetFoodFlag){
                     mMotorControl.query((byte)0x08,(byte)0xE0,midZNum);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                                 if(rec[16] == (byte)0x02){
@@ -230,11 +246,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(openOutFoodFlag1){
+                while(openOutFoodFlag1){
                     mMotorControl.query((byte)0x04,(byte)0xC0,rimZNum1);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x6F && rec[3] == (byte)0xC0 && rec[7] == (byte)0x5A){
                                 if(rec[16] == (byte)0x02){
@@ -275,11 +296,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(closeOutFoodFlag1){
+                while(closeOutFoodFlag1){
                     mMotorControl.query((byte)0x05,(byte)0xC0,rimZNum1);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x63 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x5A){
                                 if(rec[16] == (byte)0x02){
@@ -320,11 +346,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(openFallFoodFlag){
+                while(openFallFoodFlag){
                     mMotorControl.query((byte)0x09,(byte)0xE0,midZNum);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
                                 if(rec[16] == (byte)0x02){
@@ -376,11 +407,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(closeFallFoodFlag){
+                while(closeFallFoodFlag){
                     mMotorControl.query((byte)0x0A,(byte)0xE0,midZNum);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
                                 if(rec[16] == (byte)0x02){
@@ -432,11 +468,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(xFlag1){
+                while(xFlag1){
                     mMotorControl.query((byte)0x02,(byte)0xC0,rimZNum1);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x78 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x58){
                                 if(rec[16] == (byte)0x02){
@@ -477,13 +518,18 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(foodRoadFlag2){
+                while(foodRoadFlag2){
                     mMotorControl.query((byte)0x0C,(byte)0x81,rimZNum2);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
-                            if(rec[6] == (byte)0x39 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x50){
+                            if(rec[6] == (byte)0x70 && rec[3] == (byte)0x81 && rec[7] == (byte)0x50){
                                 if(rec[16] == (byte)0x02){
                                     rimZNum2++;
                                     foodRoadFlag2 = false;
@@ -525,11 +571,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(openOutFoodFlag2){
+                while(openOutFoodFlag2){
                     mMotorControl.query((byte)0x04,(byte)0xC1,rimZNum2);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x6F && rec[3] == (byte)0xC1 && rec[7] == (byte)0x5A){
                                 if(rec[16] == (byte)0x02){
@@ -570,11 +621,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(closeOutFoodFlag2){
+                while(closeOutFoodFlag2){
                     mMotorControl.query((byte)0x05,(byte)0xC1,rimZNum2);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x63 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x5A){
                                 if(rec[16] == (byte)0x02){
@@ -615,11 +671,16 @@ public class SettingTestThread extends Thread {
                         }
                     }
                 }
-                if(xFlag2){
+                while(xFlag2){
                     mMotorControl.query((byte)0x02,(byte)0xC1,rimZNum2);
                     SystemClock.sleep(delay);
                     byte[] rec = serialPort.receiveData();
                     if (rec != null && rec.length >= 5) {
+                        StringBuilder str1 = new StringBuilder();
+                        for (byte aRec : rec) {
+                            str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
+                        }
+                        Log.w("happy", "查询485收到串口："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x78 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x58){
                                 if(rec[16] == (byte)0x02){

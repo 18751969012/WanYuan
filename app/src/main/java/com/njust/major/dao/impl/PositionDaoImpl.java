@@ -113,4 +113,14 @@ public class PositionDaoImpl implements PositionDao {
         }
         return bean;
     }
+    @Override
+    public int queryPositionNo(int positionID ,int counter) {
+        int no = 0;
+        for(int i = (positionID-1)/10 * 10+1; i<= (positionID-1)/10 * 10+10; i++){
+            if(queryPosition(i ,counter).getState() == 1){
+                no++;
+            }
+        }
+        return no;
+    }
 }

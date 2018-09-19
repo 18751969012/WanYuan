@@ -116,6 +116,8 @@ public class MachineStateDaoImpl implements MachineStateDao {
         values.put("leftLight", machineState.getLeftLight());
         values.put("leftPushGoodsRaster", machineState.getLeftPushGoodsRaster());
         values.put("leftOutGoodsRaster", machineState.getLeftOutGoodsRaster());
+        values.put("leftOutGoodsDoor", machineState.getLeftOutGoodsDoor());
+
         values.put("rightTempState", machineState.getRightTempState());
         values.put("rightSetTemp", machineState.getRightSetTemp());
         values.put("rightCabinetTemp", machineState.getRightCabinetTemp());
@@ -129,11 +131,16 @@ public class MachineStateDaoImpl implements MachineStateDao {
         values.put("rightLight", machineState.getRightLight());
         values.put("rightPushGoodsRaster", machineState.getRightPushGoodsRaster());
         values.put("rightOutGoodsRaster", machineState.getRightOutGoodsRaster());
+        values.put("rightOutGoodsDoor", machineState.getRightOutGoodsDoor());
+
         values.put("midLight", machineState.getMidLight());
         values.put("midDoorLock", machineState.getMidDoorLock());
+        values.put("midDoor", machineState.getMidDoor());
         values.put("midGetGoodsRaster", machineState.getMidGetGoodsRaster());
         values.put("midDropGoodsRaster", machineState.getMidDropGoodsRaster());
         values.put("midAntiPinchHandRaster", machineState.getMidAntiPinchHandRaster());
+        values.put("midGetDoor", machineState.getMidGetDoor());
+        values.put("midDropDoor", machineState.getMidDropDoor());
         int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
     }
 
@@ -151,43 +158,53 @@ public class MachineStateDaoImpl implements MachineStateDao {
             machineState.setVmState(cursor.getInt(3));
             machineState.setLeftState(cursor.getInt(4));
             machineState.setRightState(cursor.getInt(5));
-            machineState.setLeftTempState((byte) cursor.getInt(6));
-            machineState.setLeftSetTemp((byte)cursor.getInt(7));
-            machineState.setLeftCabinetTemp((byte)cursor.getInt(8));
-            machineState.setLeftCabinetTopTemp((byte)cursor.getInt(9));
-            machineState.setLeftCompressorTemp((byte)cursor.getInt(10));
-            machineState.setLeftCompressorDCfanState((byte)cursor.getInt(11));
-            machineState.setLeftCabinetDCfanState((byte)cursor.getInt(12));
+
+            machineState.setLeftTempState(cursor.getInt(6));
+            machineState.setLeftSetTemp(cursor.getInt(7));
+            machineState.setLeftCabinetTemp(cursor.getInt(8));
+            machineState.setLeftCabinetTopTemp(cursor.getInt(9));
+            machineState.setLeftCompressorTemp(cursor.getInt(10));
+            machineState.setLeftCompressorDCfanState(cursor.getInt(11));
+            machineState.setLeftCabinetDCfanState(cursor.getInt(12));
             machineState.setLeftDoor(cursor.getInt(13));
             machineState.setLeftDoorheat(cursor.getInt(14));
             machineState.setLeftHumidity(cursor.getInt(15));
             machineState.setLeftLight(cursor.getInt(16));
             machineState.setLeftPushGoodsRaster(cursor.getInt(17));
             machineState.setLeftOutGoodsRaster(cursor.getInt(18));
-            machineState.setRightTempState((byte) cursor.getInt(19));
-            machineState.setRightSetTemp((byte)cursor.getInt(20));
-            machineState.setRightCabinetTemp((byte)cursor.getInt(21));
-            machineState.setRightCabinetTopTemp((byte)cursor.getInt(22));
-            machineState.setRightCompressorTemp((byte)cursor.getInt(23));
-            machineState.setRightCompressorDCfanState((byte)cursor.getInt(24));
-            machineState.setRightCabinetDCfanState((byte)cursor.getInt(25));
-            machineState.setRightDoor(cursor.getInt(26));
-            machineState.setRightDoorheat(cursor.getInt(27));
-            machineState.setRightHumidity(cursor.getInt(28));
-            machineState.setRightLight(cursor.getInt(29));
-            machineState.setRightPushGoodsRaster(cursor.getInt(30));
-            machineState.setRightOutGoodsRaster(cursor.getInt(31));
-            machineState.setMidLight(cursor.getInt(32));
-            machineState.setMidDoorLock(cursor.getInt(33));
-            machineState.setMidGetGoodsRaster(cursor.getInt(34));
-            machineState.setMidDropGoodsRaster(cursor.getInt(35));
-            machineState.setMidAntiPinchHandRaster(cursor.getInt(36));
-            machineState.setLeftOutPosition(cursor.getInt(37));
-            machineState.setLeftFlootPosition(cursor.getString(38));
-            machineState.setLeftFlootNo(cursor.getInt(39));
-            machineState.setRightOutPosition(cursor.getInt(40));
-            machineState.setRightFlootPosition(cursor.getString(41));
-            machineState.setRightFlootNo(cursor.getInt(42));
+            machineState.setLeftOutGoodsDoor(cursor.getInt(19));
+
+            machineState.setRightTempState(cursor.getInt(20));
+            machineState.setRightSetTemp(cursor.getInt(21));
+            machineState.setRightCabinetTemp(cursor.getInt(22));
+            machineState.setRightCabinetTopTemp(cursor.getInt(23));
+            machineState.setRightCompressorTemp(cursor.getInt(24));
+            machineState.setRightCompressorDCfanState(cursor.getInt(25));
+            machineState.setRightCabinetDCfanState(cursor.getInt(26));
+            machineState.setRightDoor(cursor.getInt(27));
+            machineState.setRightDoorheat(cursor.getInt(28));
+            machineState.setRightHumidity(cursor.getInt(29));
+            machineState.setRightLight(cursor.getInt(30));
+            machineState.setRightPushGoodsRaster(cursor.getInt(31));
+            machineState.setRightOutGoodsRaster(cursor.getInt(32));
+            machineState.setRightOutGoodsDoor(cursor.getInt(33));
+
+            machineState.setMidLight(cursor.getInt(34));
+            machineState.setMidDoorLock(cursor.getInt(35));
+            machineState.setMidDoor(cursor.getInt(36));
+            machineState.setMidGetGoodsRaster(cursor.getInt(37));
+            machineState.setMidDropGoodsRaster(cursor.getInt(38));
+            machineState.setMidAntiPinchHandRaster(cursor.getInt(39));
+            machineState.setMidGetDoor(cursor.getInt(40));
+            machineState.setMidDropDoor(cursor.getInt(41));
+
+            machineState.setLeftOutPosition(cursor.getInt(42));
+            machineState.setLeftFlootPosition(cursor.getString(43));
+            machineState.setLeftFlootNo(cursor.getInt(44));
+            machineState.setRightOutPosition(cursor.getInt(45));
+            machineState.setRightFlootPosition(cursor.getString(46));
+            machineState.setRightFlootNo(cursor.getInt(47));
+
             cursor.close();
         }
         return machineState;

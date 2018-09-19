@@ -1,6 +1,8 @@
 package com.njust.major.bean;
 
 
+import java.util.Arrays;
+
 public class MachineState {
 
     private int _id; //设备编号0
@@ -11,57 +13,58 @@ public class MachineState {
     private int rightState;
 
     //各部分状态相关
-    private byte leftTempState;//温控模式：0x00=制冷0x01=制热0x02=常温
-    private byte leftSetTemp;//-20～70
-    private byte leftCabinetTemp;//边柜温度，有符号数，127=故障
-    private byte leftCabinetTopTemp;//边柜顶部温度，有符号数，127=故障
-    private byte leftCompressorTemp;//压缩机温度，有符号数，127=故障
-    private byte leftCompressorDCfanState;//压缩机直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-    private byte leftCabinetDCfanState;//边柜直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-    private int leftDoor;//门开关状态，0=关门，1=开门
-    private int leftDoorheat;//边柜门加热状态，0=关，1=开
-    private int leftHumidity;//湿度测量值，%RH
-    private int leftLight;//照明灯状态，0=关，1=开
-    private int leftPushGoodsRaster;//下货光栅状态，0=正常，1=故障
-    private int leftOutGoodsRaster;//X轴出货光栅状态，0=正常，1=故障
+    private int leftTempState;//温控模式：0=制冷1=制热2=常温
+    private int leftSetTemp;//设定温度:-20～70
+    private int leftCabinetTemp;//边柜温度：有符号数（22222为故障）
+    private int leftCabinetTopTemp;//边柜顶部温度：有符号数（22222为故障）
+    private int leftCompressorTemp;//压缩机温度：有符号数（22222为故障）
+    private int leftCompressorDCfanState;//压缩机直流风扇状态：0=未启动1=正常2=异常
+    private int leftCabinetDCfanState;//边柜直流风扇状态：0=未启动1=正常2=异常
+    private int leftDoor;//门开关状态：0=关门1=开门
+    private int leftDoorheat;//边柜门加热状态：0=关1=开
+    private int leftHumidity;//湿度测量值：100以内代表百分比
+    private int leftLight;//照明灯状态：0=关1=开
+    private int leftPushGoodsRaster;//下货光栅状态：0=正常1=故障
+    private int leftOutGoodsRaster;//X轴出货光栅状态：0=正常1=故障
+    private int leftOutGoodsDoor;//出货门开关状态：0=关1=开2=半开半关
 
-    private byte rightTempState;//温控模式：0x00=制冷0x01=制热0x02=常温
-    private byte rightSetTemp;//-20～70
-    private byte rightCabinetTemp;//边柜温度，有符号数，127=故障
-    private byte rightCabinetTopTemp;//边柜顶部温度，有符号数，127=故障
-    private byte rightCompressorTemp;//压缩机温度，有符号数，127=故障
-    private byte rightCompressorDCfanState;//压缩机直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-    private byte rightCabinetDCfanState;//边柜直流风扇状态，0x00=未启动，0x01=正常，0x11=异常
-    private int rightDoor;//门开关状态，0=关门，1=开门
-    private int rightDoorheat;//边柜门加热状态，0=关，1=开
-    private int rightHumidity;//湿度测量值，%RH
-    private int rightLight;//照明灯状态，0=关，1=开
-    private int rightPushGoodsRaster;//下货光栅状态，0=正常，1=故障
-    private int rightOutGoodsRaster;//X轴出货光栅状态，0=正常，1=故障
+    private int rightTempState;//温控模式：0=制冷1=制热2=常温
+    private int rightSetTemp;//设定温度:-20～70
+    private int rightCabinetTemp;//边柜温度：有符号数（22222为故障）
+    private int rightCabinetTopTemp;//边柜顶部温度：有符号数（22222为故障）
+    private int rightCompressorTemp;//压缩机温度：有符号数（22222为故障）
+    private int rightCompressorDCfanState;//压缩机直流风扇状态：0=未启动1=正常2=异常
+    private int rightCabinetDCfanState;//边柜直流风扇状态：0=未启动1=正常2=异常
+    private int rightDoor;//门开关状态：0=关门1=开门
+    private int rightDoorheat;//边柜门加热状态：0=关1=开
+    private int rightHumidity;//湿度测量值：100以内代表百分比
+    private int rightLight;//照明灯状态：0=关1=开
+    private int rightPushGoodsRaster;//下货光栅状态：0=正常1=故障
+    private int rightOutGoodsRaster;//X轴出货光栅状态：0=正常1=故障
+    private int rightOutGoodsDoor;//出货门开关状态：0=关1=开2=半开半关
 
-    private int midLight;//中间照明灯状态，0=关，1=开
-    private int midDoorLock;//中间门锁状态，0=上锁，1=开锁
-    private int midGetGoodsRaster;//中间取货光栅状态，0=正常，1=故障
-    private int midDropGoodsRaster;//中间落货光栅状态，0=正常，1=故障
-    private int midAntiPinchHandRaster;//中间防夹手光栅状态，0=正常，1=故障
+    private int midLight;//中间照明灯状态：0=关1=开
+    private int midDoorLock;//中间门锁状态：0=上锁1=开锁
+    private int midDoor;//中间门开关状态：0=关门1=开门
+    private int midGetGoodsRaster;//中间取货光栅状态：0=正常1=故障
+    private int midDropGoodsRaster;//中间落货光栅状态：0=正常1=故障
+    private int midAntiPinchHandRaster;//中间防夹手光栅状态：0=正常1=故障
+    private int midGetDoor;//取货门开关状态：0=关1=开2=半开半关
+    private int midDropDoor;//落货门开关状态：0=关1=开2=半开半关
 
     //位置相关
     private int leftOutPosition;//Y轴电机出货口位置
     private int[] leftFlootPosition;//每一层的位置
     private int leftFlootNo;//层数
-//    private int[] leftFloorMotorType;//电机类型 6层*10+列，1=单弹簧机，2=双弹簧机，3=窄履带机，4=宽弹簧机
-//    private int[] leftFloorColWidth;//格位宽度 6层*10+列
 
     private int rightOutPosition;//Y轴电机出货口位置
     private int[] rightFlootPosition;//每一层的位置
     private int rightFlootNo;//层数
-//    private int[] rightFloorMotorType;//电机类型 6层*10+列，1=单弹簧机，2=双弹簧机，3=窄履带机，4=宽弹簧机
-//    private int[] rightFloorColWidth;//格位宽度 6层*10+列
 
-    public  MachineState(){
-
+    public MachineState() {
     }
-    public MachineState(int _id, String machineID, String version, int vmState, int leftState, int rightState, byte leftTempState, byte leftSetTemp, byte leftCabinetTemp, byte leftCabinetTopTemp, byte leftCompressorTemp, byte leftCompressorDCfanState, byte leftCabinetDCfanState, int leftDoor, int leftDoorheat, int leftHumidity, int leftLight, int leftPushGoodsRaster, int leftOutGoodsRaster, byte rightTempState, byte rightSetTemp, byte rightCabinetTemp, byte rightCabinetTopTemp, byte rightCompressorTemp, byte rightCompressorDCfanState, byte rightCabinetDCfanState, int rightDoor, int rightDoorheat, int rightHumidity, int rightLight, int rightPushGoodsRaster, int rightOutGoodsRaster, int midLight, int midDoorLock, int midGetGoodsRaster, int midDropGoodsRaster, int midAntiPinchHandRaster, int leftOutPosition, int[] leftFlootPosition, int leftFlootNo,int rightOutPosition, int[] rightFlootPosition, int rightFlootNo) {
+
+    public MachineState(int _id, String machineID, String version, int vmState, int leftState, int rightState, int leftTempState, int leftSetTemp, int leftCabinetTemp, int leftCabinetTopTemp, int leftCompressorTemp, int leftCompressorDCfanState, int leftCabinetDCfanState, int leftDoor, int leftDoorheat, int leftHumidity, int leftLight, int leftPushGoodsRaster, int leftOutGoodsRaster, int leftOutGoodsDoor, int rightTempState, int rightSetTemp, int rightCabinetTemp, int rightCabinetTopTemp, int rightCompressorTemp, int rightCompressorDCfanState, int rightCabinetDCfanState, int rightDoor, int rightDoorheat, int rightHumidity, int rightLight, int rightPushGoodsRaster, int rightOutGoodsRaster, int rightOutGoodsDoor, int midLight, int midDoorLock, int midDoor, int midGetGoodsRaster, int midDropGoodsRaster, int midAntiPinchHandRaster, int midGetDoor, int midDropDoor, int leftOutPosition, int[] leftFlootPosition, int leftFlootNo, int rightOutPosition, int[] rightFlootPosition, int rightFlootNo) {
         this._id = _id;
         this.machineID = machineID;
         this.version = version;
@@ -81,6 +84,7 @@ public class MachineState {
         this.leftLight = leftLight;
         this.leftPushGoodsRaster = leftPushGoodsRaster;
         this.leftOutGoodsRaster = leftOutGoodsRaster;
+        this.leftOutGoodsDoor = leftOutGoodsDoor;
         this.rightTempState = rightTempState;
         this.rightSetTemp = rightSetTemp;
         this.rightCabinetTemp = rightCabinetTemp;
@@ -94,11 +98,15 @@ public class MachineState {
         this.rightLight = rightLight;
         this.rightPushGoodsRaster = rightPushGoodsRaster;
         this.rightOutGoodsRaster = rightOutGoodsRaster;
+        this.rightOutGoodsDoor = rightOutGoodsDoor;
         this.midLight = midLight;
         this.midDoorLock = midDoorLock;
+        this.midDoor = midDoor;
         this.midGetGoodsRaster = midGetGoodsRaster;
         this.midDropGoodsRaster = midDropGoodsRaster;
         this.midAntiPinchHandRaster = midAntiPinchHandRaster;
+        this.midGetDoor = midGetDoor;
+        this.midDropDoor = midDropDoor;
         this.leftOutPosition = leftOutPosition;
         this.leftFlootPosition = leftFlootPosition;
         this.leftFlootNo = leftFlootNo;
@@ -106,6 +114,7 @@ public class MachineState {
         this.rightFlootPosition = rightFlootPosition;
         this.rightFlootNo = rightFlootNo;
     }
+
 
     public int get_id() {
         return _id;
@@ -155,59 +164,59 @@ public class MachineState {
         this.rightState = rightState;
     }
 
-    public byte getLeftTempState() {
+    public int getLeftTempState() {
         return leftTempState;
     }
 
-    public void setLeftTempState(byte leftTempState) {
+    public void setLeftTempState(int leftTempState) {
         this.leftTempState = leftTempState;
     }
 
-    public byte getLeftSetTemp() {
+    public int getLeftSetTemp() {
         return leftSetTemp;
     }
 
-    public void setLeftSetTemp(byte leftSetTemp) {
+    public void setLeftSetTemp(int leftSetTemp) {
         this.leftSetTemp = leftSetTemp;
     }
 
-    public byte getLeftCabinetTemp() {
+    public int getLeftCabinetTemp() {
         return leftCabinetTemp;
     }
 
-    public void setLeftCabinetTemp(byte leftCabinetTemp) {
+    public void setLeftCabinetTemp(int leftCabinetTemp) {
         this.leftCabinetTemp = leftCabinetTemp;
     }
 
-    public byte getLeftCabinetTopTemp() {
+    public int getLeftCabinetTopTemp() {
         return leftCabinetTopTemp;
     }
 
-    public void setLeftCabinetTopTemp(byte leftCabinetTopTemp) {
+    public void setLeftCabinetTopTemp(int leftCabinetTopTemp) {
         this.leftCabinetTopTemp = leftCabinetTopTemp;
     }
 
-    public byte getLeftCompressorTemp() {
+    public int getLeftCompressorTemp() {
         return leftCompressorTemp;
     }
 
-    public void setLeftCompressorTemp(byte leftCompressorTemp) {
+    public void setLeftCompressorTemp(int leftCompressorTemp) {
         this.leftCompressorTemp = leftCompressorTemp;
     }
 
-    public byte getLeftCompressorDCfanState() {
+    public int getLeftCompressorDCfanState() {
         return leftCompressorDCfanState;
     }
 
-    public void setLeftCompressorDCfanState(byte leftCompressorDCfanState) {
+    public void setLeftCompressorDCfanState(int leftCompressorDCfanState) {
         this.leftCompressorDCfanState = leftCompressorDCfanState;
     }
 
-    public byte getLeftCabinetDCfanState() {
+    public int getLeftCabinetDCfanState() {
         return leftCabinetDCfanState;
     }
 
-    public void setLeftCabinetDCfanState(byte leftCabinetDCfanState) {
+    public void setLeftCabinetDCfanState(int leftCabinetDCfanState) {
         this.leftCabinetDCfanState = leftCabinetDCfanState;
     }
 
@@ -259,59 +268,67 @@ public class MachineState {
         this.leftOutGoodsRaster = leftOutGoodsRaster;
     }
 
-    public byte getRightTempState() {
+    public int getLeftOutGoodsDoor() {
+        return leftOutGoodsDoor;
+    }
+
+    public void setLeftOutGoodsDoor(int leftOutGoodsDoor) {
+        this.leftOutGoodsDoor = leftOutGoodsDoor;
+    }
+
+    public int getRightTempState() {
         return rightTempState;
     }
 
-    public void setRightTempState(byte rightTempState) {
+    public void setRightTempState(int rightTempState) {
         this.rightTempState = rightTempState;
     }
 
-    public byte getRightSetTemp() {
+    public int getRightSetTemp() {
         return rightSetTemp;
     }
 
-    public void setRightSetTemp(byte rightSetTemp) {
+    public void setRightSetTemp(int rightSetTemp) {
         this.rightSetTemp = rightSetTemp;
     }
 
-    public byte getRightCabinetTemp() {
+    public int getRightCabinetTemp() {
         return rightCabinetTemp;
     }
 
-    public void setRightCabinetTemp(byte rightCabinetTemp) {
+    public void setRightCabinetTemp(int rightCabinetTemp) {
         this.rightCabinetTemp = rightCabinetTemp;
     }
 
-    public byte getRightCabinetTopTemp() {
+    public int getRightCabinetTopTemp() {
         return rightCabinetTopTemp;
     }
 
-    public void setRightCabinetTopTemp(byte rightCabinetTopTemp) {
+    public void setRightCabinetTopTemp(int rightCabinetTopTemp) {
         this.rightCabinetTopTemp = rightCabinetTopTemp;
     }
 
-    public byte getRightCompressorTemp() {
+    public int getRightCompressorTemp() {
         return rightCompressorTemp;
     }
 
-    public void setRightCompressorTemp(byte rightCompressorTemp) {
+    public void setRightCompressorTemp(int rightCompressorTemp) {
         this.rightCompressorTemp = rightCompressorTemp;
     }
 
-    public byte getRightCompressorDCfanState() {
+    public int getRightCompressorDCfanState() {
         return rightCompressorDCfanState;
     }
 
-    public void setRightCompressorDCfanState(byte rightCompressorDCfanState) {
+    public void setRightCompressorDCfanState(int rightCompressorDCfanState) {
         this.rightCompressorDCfanState = rightCompressorDCfanState;
     }
 
-    public byte getRightCabinetDCfanState() {
+    public int getRightCabinetDCfanState() {
         return rightCabinetDCfanState;
     }
 
-    public void setRightCabinetDCfanState(byte rightCabinetDCfanState) {
+    public void setRightCabinetDCfanState(int rightCabinetDCfanState) {
         this.rightCabinetDCfanState = rightCabinetDCfanState;
     }
 
@@ -363,6 +380,14 @@ public class MachineState {
         this.rightOutGoodsRaster = rightOutGoodsRaster;
     }
 
+    public int getRightOutGoodsDoor() {
+        return rightOutGoodsDoor;
+    }
+
+    public void setRightOutGoodsDoor(int rightOutGoodsDoor) {
+        this.rightOutGoodsDoor = rightOutGoodsDoor;
+    }
+
     public int getMidLight() {
         return midLight;
     }
@@ -377,6 +402,14 @@ public class MachineState {
 
     public void setMidDoorLock(int midDoorLock) {
         this.midDoorLock = midDoorLock;
+    }
+
+    public int getMidDoor() {
+        return midDoor;
+    }
+
+    public void setMidDoor(int midDoor) {
+        this.midDoor = midDoor;
     }
 
     public int getMidGetGoodsRaster() {
@@ -401,6 +434,22 @@ public class MachineState {
 
     public void setMidAntiPinchHandRaster(int midAntiPinchHandRaster) {
         this.midAntiPinchHandRaster = midAntiPinchHandRaster;
+    }
+
+    public int getMidGetDoor() {
+        return midGetDoor;
+    }
+
+    public void setMidGetDoor(int midGetDoor) {
+        this.midGetDoor = midGetDoor;
+    }
+
+    public int getMidDropDoor() {
+        return midDropDoor;
+    }
+
+    public void setMidDropDoor(int midDropDoor) {
+        this.midDropDoor = midDropDoor;
     }
 
     public int getLeftOutPosition() {
@@ -459,5 +508,59 @@ public class MachineState {
 
     public void setRightFlootNo(int rightFlootNo) {
         this.rightFlootNo = rightFlootNo;
+    }
+
+    @Override
+    public String toString() {
+        return "MachineState{" +
+                "_id=" + _id +
+                ", machineID='" + machineID + '\'' +
+                ", version='" + version + '\'' +
+                ", vmState=" + vmState +
+                ", leftState=" + leftState +
+                ", rightState=" + rightState +
+                ", leftTempState=" + leftTempState +
+                ", leftSetTemp=" + leftSetTemp +
+                ", leftCabinetTemp=" + leftCabinetTemp +
+                ", leftCabinetTopTemp=" + leftCabinetTopTemp +
+                ", leftCompressorTemp=" + leftCompressorTemp +
+                ", leftCompressorDCfanState=" + leftCompressorDCfanState +
+                ", leftCabinetDCfanState=" + leftCabinetDCfanState +
+                ", leftDoor=" + leftDoor +
+                ", leftDoorheat=" + leftDoorheat +
+                ", leftHumidity=" + leftHumidity +
+                ", leftLight=" + leftLight +
+                ", leftPushGoodsRaster=" + leftPushGoodsRaster +
+                ", leftOutGoodsRaster=" + leftOutGoodsRaster +
+                ", leftOutGoodsDoor=" + leftOutGoodsDoor +
+                ", rightTempState=" + rightTempState +
+                ", rightSetTemp=" + rightSetTemp +
+                ", rightCabinetTemp=" + rightCabinetTemp +
+                ", rightCabinetTopTemp=" + rightCabinetTopTemp +
+                ", rightCompressorTemp=" + rightCompressorTemp +
+                ", rightCompressorDCfanState=" + rightCompressorDCfanState +
+                ", rightCabinetDCfanState=" + rightCabinetDCfanState +
+                ", rightDoor=" + rightDoor +
+                ", rightDoorheat=" + rightDoorheat +
+                ", rightHumidity=" + rightHumidity +
+                ", rightLight=" + rightLight +
+                ", rightPushGoodsRaster=" + rightPushGoodsRaster +
+                ", rightOutGoodsRaster=" + rightOutGoodsRaster +
+                ", rightOutGoodsDoor=" + rightOutGoodsDoor +
+                ", midLight=" + midLight +
+                ", midDoorLock=" + midDoorLock +
+                ", midDoor=" + midDoor +
+                ", midGetGoodsRaster=" + midGetGoodsRaster +
+                ", midDropGoodsRaster=" + midDropGoodsRaster +
+                ", midAntiPinchHandRaster=" + midAntiPinchHandRaster +
+                ", midGetDoor=" + midGetDoor +
+                ", midDropDoor=" + midDropDoor +
+                ", leftOutPosition=" + leftOutPosition +
+                ", leftFlootPosition=" + Arrays.toString(leftFlootPosition) +
+                ", leftFlootNo=" + leftFlootNo +
+                ", rightOutPosition=" + rightOutPosition +
+                ", rightFlootPosition=" + Arrays.toString(rightFlootPosition) +
+                ", rightFlootNo=" + rightFlootNo +
+                '}';
     }
 }

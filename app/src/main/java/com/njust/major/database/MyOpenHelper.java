@@ -37,6 +37,7 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                 "leftLight integer,"+
                 "leftPushGoodsRaster integer,"+
                 "leftOutGoodsRaster integer,"+
+                "leftOutGoodsDoor integer,"+
 
                 "rightTempState integer," +
                 "rightSetTemp integer," +
@@ -51,12 +52,16 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                 "rightLight integer,"+
                 "rightPushGoodsRaster integer,"+
                 "rightOutGoodsRaster integer,"+
+                "rightOutGoodsDoor integer,"+
 
                 "midLight integer,"+
                 "midDoorLock integer,"+
+                "midDoor integer,"+
                 "midGetGoodsRaster integer," +
                 "midDropGoodsRaster integer," +
                 "midAntiPinchHandRaster integer," +
+                "midGetDoor integer," +
+                "midDropDoor integer," +
 
 
                 "leftOutPosition integer,"+
@@ -116,21 +121,21 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                 "leftTempState, leftSetTemp,leftCabinetTemp," +
                 "leftCabinetTopTemp, leftCompressorTemp,leftCompressorDCfanState," +
                 "leftCabinetDCfanState, leftDoor, leftDoorheat," +
-                "leftHumidity, leftLight, leftPushGoodsRaster, leftOutGoodsRaster," +
+                "leftHumidity, leftLight, leftPushGoodsRaster, leftOutGoodsRaster,leftOutGoodsDoor," +
 
                 "rightTempState, rightSetTemp,rightCabinetTemp," +
                 "rightCabinetTopTemp, rightCompressorTemp,rightCompressorDCfanState," +
                 "rightCabinetDCfanState, rightDoor, rightDoorheat," +
-                "rightHumidity, rightLight, rightPushGoodsRaster, rightOutGoodsRaster," +
+                "rightHumidity, rightLight, rightPushGoodsRaster, rightOutGoodsRaster,rightOutGoodsDoor," +
 
-                "midLight, midDoorLock, midGetGoodsRaster," +
-                "midDropGoodsRaster, midAntiPinchHandRaster," +
+                "midLight, midDoorLock, midDoor,midGetGoodsRaster," +
+                "midDropGoodsRaster, midAntiPinchHandRaster,midGetDoor,midDropDoor," +
 
                 "leftOutPosition, leftFlootPosition," +
                 "leftFlootNo," +
                 "rightOutPosition, rightFlootPosition," +
                 "rightFlootNo) values (" +
-                "'00000000','ADH816ASV3.0.0.07',0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,0,'',0)";
+                "'00000000','ADH816ASV3.0.0.07',0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,0,'',0)";
         db.execSQL(MachineInfo);
 
 

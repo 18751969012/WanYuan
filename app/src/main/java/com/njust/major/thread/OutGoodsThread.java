@@ -61,7 +61,7 @@ public class OutGoodsThread extends Thread {
     private static int packageCount2 = 0;
     private int moveTime = 1200;
     private int moveTimeOut = 4500;
-    private int delay = 110;
+    private int delay = 120;
     private int[][] goods1;
     private int[][] goods2;
 
@@ -903,10 +903,10 @@ public class OutGoodsThread extends Thread {
                 for (byte aRec : rec) {
                     str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
                 }
-                Log.w("happy", "移层反馈："+ str1);
+                Log.w("happy", "移层反馈："+ str1);Util.WriteFile("移层反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
-                        if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                        if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                             flag = false;
                             rimBoard1 = Constant.queryMoveFloor;
                             rimZNum1++;
@@ -962,7 +962,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x59){
-                        if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                        if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                             flag = false;
                             rimBoard2 = Constant.queryMoveFloor;
                             rimZNum2++;
@@ -1018,7 +1018,7 @@ public class OutGoodsThread extends Thread {
                 Log.w("happy", "推货反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x70 && rec[3] == (byte)0x80 && rec[7] == (byte)0x50){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             pushGoods1 = false;
                             rimBoard1 = Constant.moveHorizontal;
@@ -1076,7 +1076,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x70 && rec[3] == (byte)0x81 && rec[7] == (byte)0x50){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             pushGoods2 = false;
                             rimBoard2 = Constant.moveHorizontal;
@@ -1128,7 +1128,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x78 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x58){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum1++;
                             rimBoard1 = Constant.queryMoveHorizontal;
@@ -1193,7 +1193,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x78 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x58){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum2++;
                             rimBoard2 = Constant.queryMoveHorizontal;
@@ -1257,7 +1257,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
-                        if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                        if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                             flag = false;
                             rimZNum1++;
                             rimBoard1 = Constant.queryMoveFloorOut;
@@ -1308,7 +1308,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x59){
-                        if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                        if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                             flag = false;
                             rimZNum2++;
                             rimBoard2 = Constant.queryMoveFloorOut;
@@ -1359,7 +1359,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x6F && rec[3] == (byte)0xC0 && rec[7] == (byte)0x5A){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum1++;
                             closeOutGoodsDoor1 = false;
@@ -1410,7 +1410,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x6F && rec[3] == (byte)0xC1 && rec[7] == (byte)0x5A){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum2++;
                             closeOutGoodsDoor2 = false;
@@ -1461,7 +1461,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x78 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x58){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum1++;
                             rimBoard1 = Constant.queryMoveHorizontalOut;
@@ -1510,7 +1510,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x78 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x58){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum2++;
                             rimBoard2 = Constant.queryMoveHorizontalOut;
@@ -1564,7 +1564,7 @@ public class OutGoodsThread extends Thread {
                 Log.w("happy", "关出货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x63 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x5A){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum1++;
                             rimBoard1 = Constant.queryCloseOutGoodsDoor;
@@ -1626,7 +1626,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x63 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x5A){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             rimZNum2++;
                             rimBoard2 = Constant.queryCloseOutGoodsDoor;
@@ -1683,7 +1683,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x72 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
-                        if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                        if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                             flag = false;
                             rimZNum1++;
                             rimBoard1 = Constant.queryHoming;
@@ -1736,7 +1736,7 @@ public class OutGoodsThread extends Thread {
             if (rec != null && rec.length >= 5) {
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x72 && rec[3] == (byte)0xC1 && rec[7] == (byte)0x59){
-                        if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                        if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                             flag = false;
                             rimZNum2++;
                             rimBoard2 = Constant.queryHoming;
@@ -1794,7 +1794,7 @@ public class OutGoodsThread extends Thread {
                 Log.w("happy", "开取货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             midZNum++;
                             closeGetGoodsDoor = false;
@@ -1855,7 +1855,7 @@ public class OutGoodsThread extends Thread {
                 Log.w("happy", "关取货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
-                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             midZNum++;
                             midBoard = Constant.queryCloseGetGoodsDoor;
@@ -1927,7 +1927,7 @@ public class OutGoodsThread extends Thread {
 //            if (rec != null && rec.length >= 5) {
 //                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
 //                    if(rec[6] == (byte)0x66 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
-//                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+//                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
 //                            flag = false;
 //                            midZNum++;
 //                            midBoard = Constant.queryOpenDropGoodsDoor;
@@ -1976,7 +1976,7 @@ public class OutGoodsThread extends Thread {
 //            if (rec != null && rec.length >= 5) {
 //                if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
 //                    if(rec[6] == (byte)0x6C && rec[3] == (byte)0xE0 && rec[7] == (byte)0x46){
-//                        if(rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
+//                        if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
 //                            flag = false;
 //                            midZNum++;
 //                            midBoard = Constant.queryCloseDropGoodsDoor;

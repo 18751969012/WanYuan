@@ -29,6 +29,8 @@ public class VMApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		MyCrashHandler myCrashHandler = MyCrashHandler.getInstance();
+		myCrashHandler.init(getApplicationContext());
 		MyOpenHelper myOpenHelper = new MyOpenHelper(getApplicationContext());
 		SQLiteDatabase database = myOpenHelper.getReadableDatabase();
 		database.close();

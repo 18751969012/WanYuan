@@ -1827,13 +1827,22 @@ public class OutGoodsThread extends Thread {
                 if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                     if(rec[16] == (byte)0x02){
                         midZNum++;
-                        midBoard = Constant.wait;
                         timeStart();
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
                             System.arraycopy(rec, 7, errorRec, 0, 9);
                             errorHandling(0,(byte)0x4D,errorRec);
                         }
+                        midBoard = Constant.wait;
+                        queryLastedTransaction.setComplete(1);
+                        queryLastedTransaction.setError(0);
+                        tDao.updateTransaction(queryLastedTransaction);
+                        SystemClock.sleep(20);
+                        Intent intent = new Intent();
+                        intent.setAction("njust_outgoods_complete");
+                        intent.putExtra("transaction_order_number", current_transaction_order_number);
+                        intent.putExtra("outgoods_status", "success");
+                        context.sendBroadcast(intent);
                     }
                 }
             }
@@ -1907,7 +1916,7 @@ public class OutGoodsThread extends Thread {
                             Intent intent = new Intent();
                             intent.setAction("njust_outgoods_complete");
                             intent.putExtra("transaction_order_number", current_transaction_order_number);
-                            intent.putExtra("outgoods_status", "success");
+                            intent.putExtra("outgoods_status", "closeMidDoor");
                             context.sendBroadcast(intent);
                             Log.w("happy", "本次交易完毕");Util.WriteFile("本次交易完毕");
                         }

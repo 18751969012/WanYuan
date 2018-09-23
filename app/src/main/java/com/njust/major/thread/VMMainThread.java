@@ -1,6 +1,7 @@
 package com.njust.major.thread;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import static com.njust.VMApplication.VMMainThreadFlag;
+import static com.njust.VMApplication.current_transaction_order_number;
 import static com.njust.VMApplication.rimZNum1;
 import static com.njust.VMApplication.rimZNum2;
 import static com.njust.VMApplication.aisleZNum1;
@@ -221,9 +223,15 @@ public class VMMainThread extends Thread {
 
                     if(oldMidDoor != machineState.getMidDoor()){//中柜门
                         if(machineState.getMidDoor() == 1){//开门
-
+                            Intent intent = new Intent();
+                            intent.setAction("njust_midDoor_status");
+                            intent.putExtra("status", "open");
+                            context.sendBroadcast(intent);
                         }else{//关门
-
+                            Intent intent = new Intent();
+                            intent.setAction("njust_midDoor_status");
+                            intent.putExtra("status", "close");
+                            context.sendBroadcast(intent);
                         }
                         oldMidDoor = machineState.getMidDoor();
                     }

@@ -54,14 +54,18 @@ public class OutGoodsThread extends Thread {
     private TransactionDao tDao;
     private Transaction queryLastedTransaction;
     private Timer mTimer = new Timer();
-    private TimerTask timerTask;
+    private TimerTask timerTask;//首次取货门开门所用延时，和货道板推货启动后定时启动x轴移动
+    private TimerTask timerTaskPush1;
+    private TimerTask timerTaskPush2;
+    private Timer mTimerOff = new Timer();//遮挡取货门所用定时器
+    private TimerTask timerTaskOff;
 
 
     private static int packageCount1 = 0;//存放左右柜分别打包的个数,每三个凑成一个包，完成一次轮询出货
     private static int packageCount2 = 0;
-    private int moveTime = 1200;
+    private int moveTime = 700;
     private int moveTimeOut = 4500;
-    private int delay = 120;
+    private int delay = 130;
     private int[][] goods1;
     private int[][] goods2;
 
@@ -85,6 +89,7 @@ public class OutGoodsThread extends Thread {
     private boolean finshDone2 = false;
     private boolean pushGoods1 = false;
     private boolean pushGoods2 = false;
+    private boolean complete = false;//用来确定只给上位机发送一次出货成功的广播
 
 
     public OutGoodsThread(Context context){
@@ -99,6 +104,7 @@ public class OutGoodsThread extends Thread {
     public void init() {
         queryLastedTransaction = tDao.queryLastedTransaction();
         Log.w("happy", queryLastedTransaction.toString());
+        Util.WriteFile(queryLastedTransaction.toString());
         String [] str = queryLastedTransaction.getPositionIDs().split(" ");
         int[] positionIDs = new int[str.length];
         List<Integer> str1 = new ArrayList<>();
@@ -123,7 +129,6 @@ public class OutGoodsThread extends Thread {
         }
         Arrays.sort(positionIDs1);
         Arrays.sort(positionIDs2);
-
         //每三件一个包
         packageCount1 = (str1.size() % 3 == 0 ? (str1.size() / 3): (str1.size() / 3 + 1));
         packageCount2 = (str2.size() % 3 == 0 ? (str2.size() / 3): (str2.size() / 3 + 1));
@@ -351,6 +356,7 @@ public class OutGoodsThread extends Thread {
                 /*打包只有一件货*/
                 if ((set.length - (i - 1) * 3) == 1) {
                     int w = isWhere(counter,set[(i-1)*3]);
+                    Util.WriteFile(String.valueOf(w));
                     if(w <= 3){
                         outGoods[i-1][0] = set[(i-1)*3];
                         outGoods[i-1][1] = 2;
@@ -391,6 +397,9 @@ public class OutGoodsThread extends Thread {
                     }
                     int w1 = isWhere(counter,sort[0]);
                     int w2 = isWhere(counter,sort[1]);
+                    Util.WriteFile(String.valueOf(w1));
+                    Util.WriteFile(String.valueOf(w2));
+                    Util.WriteFile(sort.toString());
                     if((w1==1&&w2==1) || (w1==1&&w2==3) || (w1==2&&w2==2)){
                         outGoods[i-1][0] = sort[0];
                         outGoods[i-1][1] = 2;
@@ -411,12 +420,22 @@ public class OutGoodsThread extends Thread {
                         for(int j= 6; j<=8 ; j++){
                             outGoods[i-1][j] = 0;
                         }
-                    }else if((w1==1&&w2==5) || (w1==1&&w2==4) || (w1==2&&w2==3) || (w1==2&&w2==5)|| (w1==3&&w2==3) || (w1==3&&w2==4)){
+                    }else if((w1==2&&w2==3) || (w1==2&&w2==5)|| (w1==3&&w2==3) || (w1==3&&w2==4)){
                         outGoods[i-1][0] = sort[0];
                         outGoods[i-1][1] = 2;
                         outGoods[i-1][2] = moveTime*2;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        for(int j= 6; j<=8 ; j++){
+                            outGoods[i-1][j] = 0;
+                        }
+                    }else if((w1==1&&w2==5) || (w1==1&&w2==4)){
+                        outGoods[i-1][0] = sort[1];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[0];
+                        outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime;
                         for(int j= 6; j<=8 ; j++){
                             outGoods[i-1][j] = 0;
@@ -438,6 +457,16 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
                         outGoods[i-1][5] = moveTime;
+                        for(int j= 6; j<=8 ; j++){
+                            outGoods[i-1][j] = 0;
+                        }
+                    }else{
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 0;
+                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 0;
+                        outGoods[i-1][5] = 0;
                         for(int j= 6; j<=8 ; j++){
                             outGoods[i-1][j] = 0;
                         }
@@ -470,6 +499,10 @@ public class OutGoodsThread extends Thread {
                     int w1 = isWhere(counter,sort[0]);
                     int w2 = isWhere(counter,sort[1]);
                     int w3 = isWhere(counter,sort[2]);
+                    Util.WriteFile(String.valueOf(w1));
+                    Util.WriteFile(String.valueOf(w2));
+                    Util.WriteFile(String.valueOf(w3));
+                    Util.WriteFile(sort.toString());
                     if((w1==1&&w2==1&&w3==1) || (w1==1&&w2==1&&w3==4) || (w1==2&&w2==1&&w3==2)){
                         outGoods[i-1][0] = sort[0];
                         outGoods[i-1][1] = 2;
@@ -501,24 +534,24 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==1&&w2==1&&w3==5)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[0];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[1];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==2&&w3==3)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
                         outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime*3;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
-                        outGoods[i-1][8] = moveTime;
-                    }else if((w1==1&&w2==2&&w3==3)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
-                        outGoods[i-1][2] = moveTime*2;
-                        outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime*2;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==1&&w2==2&&w3==4) || (w1==2&&w2==3&&w3==4)){
                         outGoods[i-1][0] = sort[0];
@@ -530,25 +563,35 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
-                    }else if((w1==1&&w2==2&&w3==5) || (w1==2&&w2==2&&w3==4) || (w1==2&&w2==3&&w3==3)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
-                        outGoods[i-1][2] = moveTime*2;
-                        outGoods[i-1][3] = sort[1];
+                    }else if((w1==1&&w2==2&&w3==5)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime*3;
+                        outGoods[i-1][3] = sort[0];
                         outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][6] = sort[1];
+                        outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
-                    }else if((w1==1&&w2==3&&w3==3)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
+                    }else if((w1==2&&w2==2&&w3==4) || (w1==2&&w2==3&&w3==3)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
                         outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime*2;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==3&&w3==3)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[0];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime*3/2;
+                        outGoods[i-1][6] = sort[1];
+                        outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==1&&w2==3&&w3==4)){
                         outGoods[i-1][0] = sort[0];
@@ -560,25 +603,45 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][6] = sort[2];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
-                    }else if((w1==1&&w2==3&&w3==5) || (w1==1&&w2==4&&w3==4) || (w1==2&&w2==2&&w3==5) || (w1==3&&w2==3&&w3==3)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
+                    }else if((w1==1&&w2==3&&w3==5) || (w1==1&&w2==4&&w3==4)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
                         outGoods[i-1][2] = moveTime;
-                        outGoods[i-1][3] = sort[1];
-                        outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
-                        outGoods[i-1][8] = moveTime;
-                    }else if((w1==1&&w2==5&&w3==5)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
-                        outGoods[i-1][2] = moveTime*3;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
                         outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==2&&w2==2&&w3==5)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==3&&w2==3&&w3==3)){
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 2;
+                        outGoods[i-1][5] = moveTime/2;
                         outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][7] = 2;
+                        outGoods[i-1][8] = moveTime;
+                    }else if((w1==1&&w2==5&&w3==5)){
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 1;
+                        outGoods[i-1][5] = moveTime;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==2&&w2==2&&w3==3)){
                         outGoods[i-1][0] = sort[0];
@@ -586,9 +649,9 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][5] = moveTime/2;
                         outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==2&&w2==4&&w3==4) || (w1==3&&w2==3&&w3==4)){
                         outGoods[i-1][0] = sort[0];
@@ -601,14 +664,14 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==2&&w2==5&&w3==5) || (w1==3&&w2==4&&w3==5)){
-                        outGoods[i-1][0] = sort[0];
-                        outGoods[i-1][1] = 2;
-                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][0] = sort[2];
+                        outGoods[i-1][1] = 1;
+                        outGoods[i-1][2] = moveTime;
                         outGoods[i-1][3] = sort[1];
                         outGoods[i-1][4] = 1;
                         outGoods[i-1][5] = moveTime;
-                        outGoods[i-1][6] = sort[2];
-                        outGoods[i-1][7] = 1;
+                        outGoods[i-1][6] = sort[0];
+                        outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
                     }else if((w1==3&&w2==3&&w3==5)){
                         outGoods[i-1][0] = sort[0];
@@ -700,6 +763,16 @@ public class OutGoodsThread extends Thread {
                         outGoods[i-1][6] = sort[0];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
+                    }else{
+                        outGoods[i-1][0] = sort[0];
+                        outGoods[i-1][1] = 0;
+                        outGoods[i-1][2] = 0;
+                        outGoods[i-1][3] = sort[1];
+                        outGoods[i-1][4] = 0;
+                        outGoods[i-1][5] = 0;
+                        outGoods[i-1][6] = sort[2];
+                        outGoods[i-1][7] = 0;
+                        outGoods[i-1][8] = 0;
                     }
                 }
             }
@@ -712,6 +785,8 @@ public class OutGoodsThread extends Thread {
     private int isWhere(int counter, int positionID) {
         int where = 0;
         Position p = pDao.queryPosition(positionID ,counter);
+        Util.WriteFile(p.toString());
+        Util.WriteFile(String.valueOf(pDao.queryPositionNo(positionID ,counter)));
         int row1 = p.getPosition1() % 16;
         int row2 = p.getPosition2() % 16;
         switch (p.getMotorType()) {
@@ -722,6 +797,8 @@ public class OutGoodsThread extends Thread {
                     }else if(row1 == 3){
                         where = 4;
                     }else if(row1 == 4){
+                        where = 5;
+                    }else{
                         where = 5;
                     }
                 }else {
@@ -763,6 +840,8 @@ public class OutGoodsThread extends Thread {
                             where = 2;
                         } else if (row1 == 5 || row1 == 6) {
                             where = 3;
+                        }else{
+                            where = 4;
                         }
                     } else {
                         if (row1 == 3 || row1 == 4) {
@@ -771,9 +850,11 @@ public class OutGoodsThread extends Thread {
                             where = 4;
                         } else if (row1 == 7 || row1 == 8) {
                             where = 5;
+                        }else{
+                            where = 2;
                         }
                     }
-                }else if(pDao.queryPositionNo(positionID ,counter) == 10){
+                }else{
                     if (counter == 1) {
                         if (row1 == 1 || row1 == 2) {
                             where = 1;
@@ -783,6 +864,8 @@ public class OutGoodsThread extends Thread {
                             where = 3;
                         } else if (row1 == 7 || row1 == 8) {
                             where = 4;
+                        }else{
+                            where = 5;
                         }
                     } else {
                         if (row1 == 3 || row1 == 4 || row1 == 5) {
@@ -791,6 +874,8 @@ public class OutGoodsThread extends Thread {
                             where = 4;
                         } else if (row1 == 9 || row1 == 10) {
                             where = 5;
+                        }else{
+                            where = 1;
                         }
                     }
                 }
@@ -886,6 +971,49 @@ public class OutGoodsThread extends Thread {
             }
         };
         mTimer.schedule(timerTask,1000);
+    }
+    private void timeStartPush(int counter){
+        if(counter == 1){
+            if(timerTaskPush1 != null){
+                timerTaskPush1.cancel();
+                timerTaskPush1 = null;
+            }
+            timerTaskPush1 = new TimerTask() {
+                @Override
+                public void run() {
+                    rimBoard1 = Constant.moveHorizontal;
+                }
+            };
+            mTimer.schedule(timerTaskPush1,1000);
+        }else{
+            if(timerTaskPush2 != null){
+                timerTaskPush2.cancel();
+                timerTaskPush2 = null;
+            }
+            timerTaskPush2 = new TimerTask() {
+                @Override
+                public void run() {
+                    rimBoard2 = Constant.moveHorizontal;
+                }
+            };
+            mTimer.schedule(timerTaskPush2,1000);
+        }
+    }
+
+    private void timeStartOff(){
+        if(timerTaskOff != null){
+            timerTaskOff.cancel();
+            timerTaskOff = null;
+        }
+        timerTaskOff = new TimerTask() {
+            @Override
+            public void run() {
+                midBoard = Constant.closeGetGoodsDoor;
+                Util.WriteFile("到时间关闭取货门");
+            }
+        };
+        mTimerOff.schedule(timerTaskOff,1000);
+        Util.WriteFile("开启定时器");
     }
 
 
@@ -1021,7 +1149,7 @@ public class OutGoodsThread extends Thread {
                         if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             pushGoods1 = false;
-                            rimBoard1 = Constant.moveHorizontal;
+                            timeStartPush(1);
                             aisleBoard1 = Constant.queryPushGoods;
                             aisleZNum1++;
                         }
@@ -1079,7 +1207,7 @@ public class OutGoodsThread extends Thread {
                         if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
                             flag = false;
                             pushGoods2 = false;
-                            rimBoard2 = Constant.moveHorizontal;
+                            timeStartPush(2);
                             aisleBoard2 = Constant.queryPushGoods;
                             aisleZNum2++;
                         }
@@ -1603,6 +1731,7 @@ public class OutGoodsThread extends Thread {
                         }
                         if(finshDone1 && finshDone2){
                             midBoard = Constant.openGetGoodsDoor;
+                            complete = true;
                         }
                         rimBoard1 = Constant.homing;
                         if((rec[9]&0x01) != (byte)0x01){
@@ -1660,6 +1789,7 @@ public class OutGoodsThread extends Thread {
                         }
                         if(finshDone1 && finshDone2){
                             midBoard = Constant.openGetGoodsDoor;
+                            complete = true;
                         }
                         rimBoard2 = Constant.homing;
                         if((rec[9]&0x01) != (byte)0x01){
@@ -1792,6 +1922,7 @@ public class OutGoodsThread extends Thread {
                     str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
                 }
                 Log.w("happy", "开取货门反馈："+ str1);
+                Util.WriteFile("开取货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                         if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -1823,26 +1954,34 @@ public class OutGoodsThread extends Thread {
                 str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
             }
             Log.w("happy", "开取货门查询反馈："+ str1);
+            Util.WriteFile("开取货门查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x64 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                     if(rec[16] == (byte)0x02){
                         midZNum++;
-                        timeStart();
+                        if(complete) {
+                            timeStart();
+                        }else{
+                            timeStartOff();
+                        }
                         if((rec[9]&0x01) != (byte)0x01){
                             byte[] errorRec = new byte[9];
                             System.arraycopy(rec, 7, errorRec, 0, 9);
                             errorHandling(0,(byte)0x4D,errorRec);
                         }
                         midBoard = Constant.wait;
-                        queryLastedTransaction.setComplete(1);
-                        queryLastedTransaction.setError(0);
-                        tDao.updateTransaction(queryLastedTransaction);
-                        SystemClock.sleep(20);
-                        Intent intent = new Intent();
-                        intent.setAction("njust_outgoods_complete");
-                        intent.putExtra("transaction_order_number", current_transaction_order_number);
-                        intent.putExtra("outgoods_status", "success");
-                        context.sendBroadcast(intent);
+                        if(complete){
+                            queryLastedTransaction.setComplete(1);
+                            queryLastedTransaction.setError(0);
+                            tDao.updateTransaction(queryLastedTransaction);
+                            SystemClock.sleep(20);
+                            Intent intent = new Intent();
+                            intent.setAction("njust_outgoods_complete");
+                            intent.putExtra("transaction_order_number", current_transaction_order_number);
+                            intent.putExtra("outgoods_status", "success");
+                            context.sendBroadcast(intent);
+                            complete = false;
+                        }
                     }
                 }
             }
@@ -1862,6 +2001,7 @@ public class OutGoodsThread extends Thread {
                     str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
                 }
                 Log.w("happy", "关取货门反馈："+ str1);
+                Util.WriteFile("关取货门反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                         if(rec[16] == (byte)0x00 || rec[16] == (byte)0x01 || rec[16] == (byte)0x03){
@@ -1892,6 +2032,7 @@ public class OutGoodsThread extends Thread {
                 str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
             }
             Log.w("happy", "关取货门查询反馈："+ str1);
+            Util.WriteFile("关取货门查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x75 && rec[3] == (byte)0xE0 && rec[7] == (byte)0x4D){
                     if(rec[16] == (byte)0x02){
@@ -1909,6 +2050,8 @@ public class OutGoodsThread extends Thread {
                             }
                             OutGoodsThreadFlag = false;
                             serialPort485.close();
+                            mTimer.cancel();
+                            mTimerOff.cancel();
                             queryLastedTransaction.setComplete(1);
                             queryLastedTransaction.setError(0);
                             tDao.updateTransaction(queryLastedTransaction);
@@ -1916,7 +2059,7 @@ public class OutGoodsThread extends Thread {
                             Intent intent = new Intent();
                             intent.setAction("njust_outgoods_complete");
                             intent.putExtra("transaction_order_number", current_transaction_order_number);
-                            intent.putExtra("outgoods_status", "closeMidDoor");
+                            intent.putExtra("outgoods_status", "closeMidDoorSuccess");
                             context.sendBroadcast(intent);
                             Log.w("happy", "本次交易完毕");Util.WriteFile("本次交易完毕");
                         }

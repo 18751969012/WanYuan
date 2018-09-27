@@ -117,7 +117,7 @@ public class PositionDaoImpl implements PositionDao {
     public int queryPositionNo(int positionID ,int counter) {
         int no = 0;
         for(int i = (positionID-1)/10 * 10+1; i<= (positionID-1)/10 * 10+10; i++){
-            if(queryPosition(i ,counter).getState() == 1){
+            if(queryPosition(i ,counter).getState() == 1 || (i>1&& queryPosition(i ,counter).getPosition1()==queryPosition(i-1 ,counter).getPosition2())){
                 no++;
             }
         }

@@ -3,6 +3,7 @@ package com.njust.major.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -11,21 +12,28 @@ import com.njust.major.util.Util;
 
 import static com.njust.VMApplication.VMMainThreadFlag;
 import static com.njust.VMApplication.OutGoodsThreadFlag;
+import static com.njust.VMApplication.VMMainThreadRunning;
+import static com.njust.VMApplication.mQuery0Flag;
+import static com.njust.VMApplication.mQuery1Flag;
+import static com.njust.VMApplication.mQuery2Flag;
+import static com.njust.VMApplication.mUpdataDatabaseFlag;
 
 
 public class OutGoodsService extends Service {
     private OutGoodsThread mOutGoodsThread;
 
-
     @Override
     public void onCreate(){
         super.onCreate();
         VMMainThreadFlag = false;
+        mQuery1Flag = false;
+        mQuery2Flag = false;
+        mQuery0Flag = false;
+        mUpdataDatabaseFlag = false;
         OutGoodsThreadFlag = true;
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        SystemClock.sleep(20);
+        while(VMMainThreadRunning){
+            SystemClock.sleep(20);
         }
         mOutGoodsThread = new OutGoodsThread(getApplicationContext());
         mOutGoodsThread.init();

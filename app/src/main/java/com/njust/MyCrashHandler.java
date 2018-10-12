@@ -33,7 +33,7 @@ public class MyCrashHandler implements UncaughtExceptionHandler {
 
 		String logPath;
 		logPath = Environment.getExternalStorageDirectory().getAbsoluteFile()
-				+ "/VM/" + "错误日志Log";
+				+ "/Njust/错误日志";
 
 		File file = new File(logPath);
 		if (!file.exists()) {

@@ -33,8 +33,21 @@ public class MachineStateDaoImpl implements MachineStateDao {
             db.execSQL(sql1, bindArgs1);
         }
     }
+
     @Override
-    public void updateTemperature(byte leftTempState, byte leftSetTemp, byte rightTempState, byte rightSetTemp) {
+    public void updateDCfan(int leftCompressorDCfanState, int leftCabinetDCfanState, int rightCompressorDCfanState, int rightCabinetDCfanState) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("leftCompressorDCfanState", leftCompressorDCfanState);
+        values.put("leftCabinetDCfanState", leftCabinetDCfanState);
+        values.put("rightCompressorDCfanState", rightCompressorDCfanState);
+        values.put("rightCabinetDCfanState", rightCabinetDCfanState);
+        int update = context.getContentResolver().update(uri, values, "_id=?",
+                new String[] { "1" });
+    }
+
+    @Override
+    public void updateTemperature(int leftTempState, int leftSetTemp, int rightTempState, int rightSetTemp) {
         Uri uri = Uri.parse("content://com.njust/Mupdate");
         ContentValues values = new ContentValues();
         values.put("leftTempState", leftTempState);
@@ -44,6 +57,25 @@ public class MachineStateDaoImpl implements MachineStateDao {
         int update = context.getContentResolver().update(uri, values, "_id=?",
                 new String[] { "1" });
     }
+
+
+    @Override
+    public void updateMeasureTemp(int leftCompressorTemp, int leftCabinetTemp, int leftCabinetTopTemp, int leftHumidity,
+                                  int rightCompressorTemp, int rightCabinetTemp,int rightCabinetTopTemp, int rightHumidity) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("leftCompressorTemp", leftCompressorTemp);
+        values.put("leftCabinetTemp", leftCabinetTemp);
+        values.put("leftCabinetTopTemp", leftCabinetTopTemp);
+        values.put("leftHumidity", leftHumidity);
+        values.put("rightCompressorTemp", rightCompressorTemp);
+        values.put("rightCabinetTemp", rightCabinetTemp);
+        values.put("rightCabinetTopTemp", rightCabinetTopTemp);
+        values.put("rightHumidity", rightHumidity);
+        int update = context.getContentResolver().update(uri, values, "_id=?",
+                new String[] { "1" });
+    }
+
 
     @Override
     public void updateLight(int leftLight, int rightLight, int midLight) {
@@ -81,9 +113,9 @@ public class MachineStateDaoImpl implements MachineStateDao {
     }
 
     @Override
-    public void updateDoorState(int leftDoor, int rightDoor, int midDoorLock) {
-        String sql1 = "update MachineInfo set leftDoor=?， rightDoor=? ,midDoorLock=? where _id =1";
-        Object[] bindArgs1 = new Object[] { "" + leftDoor + "" + rightDoor + "" + midDoorLock };
+    public void updateDoorState(int leftDoor, int rightDoor,  int midDoor, int midDoorLock) {
+        String sql1 = "update MachineInfo set leftDoor=?, rightDoor=? , midDoor=? , midDoorLock=? where _id =1";
+        Object[] bindArgs1 = new Object[] { "" + leftDoor + "" + rightDoor + "" + midDoor +  "" + midDoorLock };
         db.execSQL(sql1, bindArgs1);
     }
 
@@ -92,6 +124,31 @@ public class MachineStateDaoImpl implements MachineStateDao {
         String sql1 = "update MachineInfo set leftDoorheat=?, rightDoorheat=? where _id =1";
         Object[] bindArgs1 = new Object[] { "" + leftDoorheat, "" + rightDoorheat };
         db.execSQL(sql1, bindArgs1);
+    }
+
+    @Override
+    public void updateRasterState(int leftPushGoodsRaster, int leftOutGoodsRaster, int rightPushGoodsRaster, int rightOutGoodsRaster, int midGetGoodsRaster, int midDropGoodsRaster, int midAntiPinchHandRaster){
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("leftPushGoodsRaster", leftPushGoodsRaster);
+        values.put("leftOutGoodsRaster", leftOutGoodsRaster);
+        values.put("rightPushGoodsRaster", rightPushGoodsRaster);
+        values.put("rightOutGoodsRaster", rightOutGoodsRaster);
+        values.put("midGetGoodsRaster", midGetGoodsRaster);
+        values.put("midDropGoodsRaster", midDropGoodsRaster);
+        values.put("midAntiPinchHandRaster", midAntiPinchHandRaster);
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+
+    @Override
+    public void updateOtherDoorState(int leftOutGoodsDoor, int rightOutGoodsDoor, int midGetDoor, int midDropDoor){
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("leftOutGoodsDoor", leftOutGoodsDoor);
+        values.put("rightOutGoodsDoor", rightOutGoodsDoor);
+        values.put("midGetDoor", midGetDoor);
+        values.put("midDropDoor", midDropDoor);
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
     }
 
     @Override

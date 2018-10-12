@@ -31,13 +31,15 @@
             android:id="@+id/row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="行" />
+            android:hint="行(0代表所有行)"
+            android:text=""/>
 
         <EditText
             android:id="@+id/column"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="列" />
+            android:hint="列(0代表所有列)"
+            android:text=""/>
 
         <Button
             android:id="@+id/houdao_motor"
@@ -95,23 +97,23 @@
             android:layout_height="wrap_content"
             android:text="出货门电机信息" />
 
-        <Button
-            android:id="@+id/open_fall_door"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="开落货门" />
+        <!--<Button-->
+            <!--android:id="@+id/open_fall_door"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="开落货门" />-->
 
-        <Button
-            android:id="@+id/close_fall_door"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="关落货门" />
+        <!--<Button-->
+            <!--android:id="@+id/close_fall_door"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="关落货门" />-->
 
-        <TextView
-            android:id="@+id/luohuo_msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="落货门电机信息" />
+        <!--<TextView-->
+            <!--android:id="@+id/luohuo_msg"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="落货门电机信息" />-->
 
         <Button
             android:id="@+id/x_motor_zhen"
@@ -139,11 +141,11 @@
         android:layout_weight="2"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/open_center_lock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="开电磁锁" />
+        <!--<Button-->
+            <!--android:id="@+id/open_center_lock"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="开电磁锁" />-->
 
         <Button
             android:id="@+id/open_side_light"

@@ -52,6 +52,11 @@
                 <action android:name="Avm.START_OUTGOODS" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".major.receive.ChangeSettingReceive">
+            <intent-filter>
+                <action android:name="Avm.START_ChangeSetting" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

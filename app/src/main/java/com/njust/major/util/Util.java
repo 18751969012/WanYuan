@@ -15,13 +15,13 @@ import java.util.Locale;
 public class Util {
 	public static long count = 0;
 	private static FileWriter fw = null;
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
 	private static SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 	static {
 		File destFolder = new File(Environment.getExternalStorageDirectory()
-				.getAbsoluteFile() + "/Android/data/log");
+				.getAbsoluteFile() + "/Njust/log");
 		if (!destFolder.exists()) {
-			destFolder.mkdir();
+			destFolder.mkdirs();
 		}
 	}
 
@@ -56,7 +56,7 @@ public class Util {
 		String t = sd.format(Calendar.getInstance().getTime());
 		String path = Environment.getExternalStorageDirectory()
 				.getAbsoluteFile()
-				+ "/Android/data/log/comm_debug" + t + ".text";
+				+ "/Njust/log/" + t + ".text";
 		String time = sdf.format(Calendar.getInstance().getTime());
 		String text = time + " " + content + "\r";
 		try {

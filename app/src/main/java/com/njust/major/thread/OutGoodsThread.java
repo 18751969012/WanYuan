@@ -35,7 +35,12 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 
 import static com.njust.VMApplication.OutGoodsThreadFlag;
+import static com.njust.VMApplication.VMMainThreadFlag;
 import static com.njust.VMApplication.current_transaction_order_number;
+import static com.njust.VMApplication.mQuery0Flag;
+import static com.njust.VMApplication.mQuery1Flag;
+import static com.njust.VMApplication.mQuery2Flag;
+import static com.njust.VMApplication.mUpdataDatabaseFlag;
 import static com.njust.VMApplication.rimZNum1;
 import static com.njust.VMApplication.rimZNum2;
 import static com.njust.VMApplication.aisleZNum1;
@@ -433,7 +438,7 @@ public class OutGoodsThread extends Thread {
                     }else if((w1==1&&w2==5) || (w1==1&&w2==4)){
                         outGoods[i-1][0] = sort[1];
                         outGoods[i-1][1] = 1;
-                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][2] = moveTime*4;
                         outGoods[i-1][3] = sort[0];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime;
@@ -536,7 +541,7 @@ public class OutGoodsThread extends Thread {
                     }else if((w1==1&&w2==1&&w3==5)){
                         outGoods[i-1][0] = sort[2];
                         outGoods[i-1][1] = 1;
-                        outGoods[i-1][2] = moveTime*2;
+                        outGoods[i-1][2] = moveTime*4;
                         outGoods[i-1][3] = sort[0];
                         outGoods[i-1][4] = 2;
                         outGoods[i-1][5] = moveTime;
@@ -566,10 +571,10 @@ public class OutGoodsThread extends Thread {
                     }else if((w1==1&&w2==2&&w3==5)){
                         outGoods[i-1][0] = sort[2];
                         outGoods[i-1][1] = 1;
-                        outGoods[i-1][2] = moveTime*3;
+                        outGoods[i-1][2] = moveTime*4;
                         outGoods[i-1][3] = sort[0];
                         outGoods[i-1][4] = 2;
-                        outGoods[i-1][5] = moveTime*2;
+                        outGoods[i-1][5] = moveTime;
                         outGoods[i-1][6] = sort[1];
                         outGoods[i-1][7] = 2;
                         outGoods[i-1][8] = moveTime;
@@ -938,6 +943,11 @@ public class OutGoodsThread extends Thread {
         queryLastedTransaction.setError(1);
         tDao.updateTransaction(queryLastedTransaction);
         OutGoodsThreadFlag = false;
+        VMMainThreadFlag = true;
+        mQuery1Flag = true;
+        mQuery2Flag = true;
+        mQuery0Flag = true;
+        mUpdataDatabaseFlag = true;
         SystemClock.sleep(20);
         Intent intent = new Intent();
         intent.setAction("njust_outgoods_complete");
@@ -970,7 +980,7 @@ public class OutGoodsThread extends Thread {
                 midBoard = Constant.closeGetGoodsDoor;
             }
         };
-        mTimer.schedule(timerTask,1000);
+        mTimer.schedule(timerTask,15000);
     }
     private void timeStartPush(int counter){
         if(counter == 1){
@@ -984,7 +994,7 @@ public class OutGoodsThread extends Thread {
                     rimBoard1 = Constant.moveHorizontal;
                 }
             };
-            mTimer.schedule(timerTaskPush1,1000);
+            mTimer.schedule(timerTaskPush1,1100);
         }else{
             if(timerTaskPush2 != null){
                 timerTaskPush2.cancel();
@@ -996,7 +1006,7 @@ public class OutGoodsThread extends Thread {
                     rimBoard2 = Constant.moveHorizontal;
                 }
             };
-            mTimer.schedule(timerTaskPush2,1000);
+            mTimer.schedule(timerTaskPush2,1100);
         }
     }
 
@@ -1009,10 +1019,10 @@ public class OutGoodsThread extends Thread {
             @Override
             public void run() {
                 midBoard = Constant.closeGetGoodsDoor;
-                Util.WriteFile("到时间关闭取货门");
+                Util.WriteFile("遮挡到时间再次关闭取货门");
             }
         };
-        mTimerOff.schedule(timerTaskOff,1000);
+        mTimerOff.schedule(timerTaskOff,3000);
         Util.WriteFile("开启定时器");
     }
 
@@ -1023,7 +1033,6 @@ public class OutGoodsThread extends Thread {
         while (flag){
             Log.w("happy", "发送移层");
             mMotorControl.moveFloor(1,rimZNum1,goods1[currentPackageCount1][currentOutCount1*3]);
-
             SystemClock.sleep(delay);
             byte[] rec = serialPort485.receiveData();
             if (rec != null && rec.length >= 5) {
@@ -1031,7 +1040,7 @@ public class OutGoodsThread extends Thread {
                 for (byte aRec : rec) {
                     str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
                 }
-                Log.w("happy", "移层反馈："+ str1);Util.WriteFile("移层反馈："+ str1);
+                Log.w("happy", "左柜移层反馈："+ str1);Util.WriteFile("左柜移层反馈："+ str1);
                 if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                     if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
                         if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
@@ -1062,7 +1071,8 @@ public class OutGoodsThread extends Thread {
             for (byte aRec : rec) {
                 str1.append(Integer.toHexString(aRec&0xFF)).append(" ");
             }
-            Log.w("happy", "移层查询反馈："+ str1);
+            Log.w("happy", "左柜移层查询反馈："+ str1);
+            Util.WriteFile("左柜移层查询反馈："+ str1);
             if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                 if(rec[6] == (byte)0x79 && rec[3] == (byte)0xC0 && rec[7] == (byte)0x59){
                     if(rec[18] == (byte)0x02){
@@ -2049,7 +2059,6 @@ public class OutGoodsThread extends Thread {
                                 errorHandling(0,(byte)0x4D,errorRec);
                             }
                             OutGoodsThreadFlag = false;
-                            serialPort485.close();
                             mTimer.cancel();
                             mTimerOff.cancel();
                             queryLastedTransaction.setComplete(1);
@@ -2062,6 +2071,11 @@ public class OutGoodsThread extends Thread {
                             intent.putExtra("outgoods_status", "closeMidDoorSuccess");
                             context.sendBroadcast(intent);
                             Log.w("happy", "本次交易完毕");Util.WriteFile("本次交易完毕");
+                            VMMainThreadFlag = true;
+                            mQuery1Flag = true;
+                            mQuery2Flag = true;
+                            mQuery0Flag = true;
+                            mUpdataDatabaseFlag = true;
                         }
                     }
                 }
@@ -2502,6 +2516,11 @@ public class OutGoodsThread extends Thread {
         intent.putExtra("transaction_order_number", current_transaction_order_number);
         intent.putExtra("outgoods_status", "fail");
         context.sendBroadcast(intent);
+        VMMainThreadFlag = true;
+        mQuery1Flag = true;
+        mQuery2Flag = true;
+        mQuery0Flag = true;
+        mUpdataDatabaseFlag = true;
     }
     /**
      * 将byte转换为一个长度为8的byte数组，数组每个值代表bit

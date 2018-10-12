@@ -1,5 +1,6 @@
 package com.njust;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +16,18 @@ import android.widget.TextView;
 import com.njust.major.SCM.MotorControl;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
+import com.njust.major.util.Util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.njust.VMApplication.OutGoodsThreadFlag;
+import static com.njust.VMApplication.VMMainThreadFlag;
+import static com.njust.VMApplication.VMMainThreadRunning;
+import static com.njust.VMApplication.mQuery0Flag;
+import static com.njust.VMApplication.mQuery1Flag;
+import static com.njust.VMApplication.mQuery2Flag;
+import static com.njust.VMApplication.mUpdataDatabaseFlag;
 import static com.njust.VMApplication.midZNum;
 import static com.njust.VMApplication.rimZNum1;
 
@@ -28,7 +40,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private EditText mFloorNo;//层数
     private TextView mFloors;
 
-    private int thisFloorPosition;
+    private int thisFloorPosition = -1;
     private int outFloorPosition; //出口
     private int[] floorsPosition; //各层
     private MachineStateDao mDao;
@@ -43,11 +55,19 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private MotorControl motorControl;
     private int counter = 1;
     private byte zhen = 0;
-    private int delay = 150;
+    private int delay = 130;
     private int[] yResponse = new int[5];
     private String Response;
     private boolean stopFlag = false;
     private boolean threadFlag = false;
+    private boolean queryStopSuccess = false;
+    private Button fastUp;
+    private Button slowUp;
+    private Button fastDown;
+    private Button slowDown;
+    private Button stop;
+
+
 
 
 
@@ -55,7 +75,6 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-
         mDao = new MachineStateDaoImpl(getApplicationContext());
 
         mTheMSG = (TextView) findViewById(R.id.the_msg);
@@ -67,11 +86,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         mInput = (EditText) findViewById(R.id.manuel_floor_no);
         floorsPosition = new int[0];
 
-        Button fastUp = (Button) findViewById(R.id.fast_up);
-        Button slowUp = (Button) findViewById(R.id.slow_up);
-        Button fastDown = (Button) findViewById(R.id.fast_down);
-        Button slowDown = (Button) findViewById(R.id.slow_down);
-        Button stop = (Button) findViewById(R.id.stop);
+        fastUp = (Button) findViewById(R.id.fast_up);
+        slowUp = (Button) findViewById(R.id.slow_up);
+        fastDown = (Button) findViewById(R.id.fast_down);
+        slowDown = (Button) findViewById(R.id.slow_down);
+        stop = (Button) findViewById(R.id.stop);
         Button confirmThis = (Button) findViewById(R.id.confirm_this);
         Button changeCounter = (Button) findViewById(R.id.change_counter);
         Button confirmFloorNo = (Button) findViewById(R.id.confirm_floor_no);
@@ -97,14 +116,29 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         confirmAll.setOnClickListener(this);
         manuelConfirm.setOnClickListener(this);
         getInTestActivty.setOnClickListener(this);
+        VMMainThreadFlag = false;
+        mQuery1Flag = false;
+        mQuery2Flag = false;
+        mQuery0Flag = false;
+        mUpdataDatabaseFlag = false;
+        SystemClock.sleep(20);
+        while(VMMainThreadRunning){
+            SystemClock.sleep(20);
+        }
         serialPort = mSerialPort;
         motorControl = new MotorControl(serialPort, getApplicationContext());
+        Util.WriteFile("进入设置界面");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        serialPort.close();
+        VMMainThreadFlag = true;
+        mQuery1Flag = true;
+        mQuery2Flag = true;
+        mQuery0Flag = true;
+        mUpdataDatabaseFlag = true;
+        Util.WriteFile("返回上位机，开启主线程");
     }
 
     @Override
@@ -121,18 +155,28 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fast_up:
+                closeButton();
                 motorControl.counterCommand(counter, zhen++, 5);
+                openButton();
                 break;
             case R.id.slow_up:
+                closeButton();
                 motorControl.counterCommand(counter, zhen++, 7);
+                openButton();
                 break;
             case R.id.fast_down:
+                closeButton();
                 motorControl.counterCommand(counter, zhen++, 6);
+                openButton();
                 break;
             case R.id.slow_down:
+                closeButton();
                 motorControl.counterCommand(counter, zhen++, 8);
+                openButton();
                 break;
             case R.id.stop:
+                closeButton();
+                queryStopSuccess = false;
                 boolean flag = true;
                 int times = 0;
                 while (flag){
@@ -148,7 +192,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                         Log.w("happy", "发送反馈："+ str1);
                         if(rec[0] == (byte)0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte)0x0F && rec[rec.length-2] == (byte)0xF1 /*&& isVerify(rec)*/){
                             if(rec[6] == (byte)0x31 && rec[3] == (byte)(0xC0+(counter-1)) && rec[7] == (byte)0x59){
-                                if(rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
+                                if(rec[18] == (byte)0x00 || rec[18] == (byte)0x01 || rec[18] == (byte)0x03){
                                     flag = false;
                                     threadFlag=true;
                                     stopFlag=true;
@@ -162,11 +206,13 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                         flag = false;
                         Response = "测试通信故障";
                         Log.w("happy", "测试通信故障");
+                        openButton();
                     }
                 }
-                SystemClock.sleep(delay);
-                SystemClock.sleep(delay);
-                mTheMSG.setText(thisFloorPosition+ " ");
+                while (!queryStopSuccess){
+                    SystemClock.sleep(10);
+                }
+                mTheMSG.setText(thisFloorPosition+"");
                 yMotor.setText(Response);
                 threadFlag=false;
                 stopFlag=false;
@@ -190,8 +236,27 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 confirmAll();
                 break;
             case R.id.manuel_confirm_floor_no:
-                thisFloorPosition = Integer.parseInt(mInput.getText().toString());
-                confirmThis();
+                String txt = mInput.getText().toString();
+                Pattern p = Pattern.compile("[0-9]*");
+                Matcher m = p.matcher(txt);
+                if(m.matches() && !mInput.getText().toString().equals("")){//输入的数字
+                    if(Integer.parseInt(mInput.getText().toString()) > 0){
+                        thisFloorPosition = Integer.parseInt(mInput.getText().toString());
+                        confirmThis();
+                    }else{
+                        AlertDialog.Builder message = new AlertDialog.Builder(this);
+                        message.setTitle("Error");
+                        message.setMessage("请输入大于0的数字");
+                        message.setPositiveButton("OK", null);
+                        message.show();
+                    }
+                }else{
+                    AlertDialog.Builder message = new AlertDialog.Builder(this);
+                    message.setTitle("Error");
+                    message.setMessage("请输入数字");
+                    message.setPositiveButton("OK", null);
+                    message.show();
+                }
                 break;
             case R.id.test_activity_button:
                 Intent intent = new Intent(SettingActivity.this, SettingTestActivty.class);
@@ -200,7 +265,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.return_back_button:
                 stopFlag = false;
                 this.finish();
-                serialPort.close();
+                VMMainThreadFlag = true;
+                mQuery1Flag = true;
+                mQuery2Flag = true;
+                mQuery0Flag = true;
+                mUpdataDatabaseFlag = true;
+                Util.WriteFile("返回上位机，开启主线程");
                 break;
         }
     }
@@ -213,35 +283,74 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         }
         deleteAll();
     }
-
+    private void closeButton() {
+        fastUp.setClickable(false);
+        slowUp.setClickable(false);
+        fastDown.setClickable(false);
+        slowDown.setClickable(false);
+        stop.setClickable(false);
+    }
+    private void openButton() {
+        fastUp.setClickable(true);
+        slowUp.setClickable(true);
+        fastDown.setClickable(true);
+        slowDown.setClickable(true);
+        stop.setClickable(true);
+    }
     public void confirmFloor() {
-        deleteIt();
-        int a = Integer.parseInt(mFloorNo.getText().toString());
-        floorsPosition = new int[a];
-
-        showMsg();
+        floorsPosition = new int[0];
+        outFloorPosition = 0;
+        if(mFloorNo.getText().toString().equals("1") || mFloorNo.getText().toString().equals("2") ||
+                mFloorNo.getText().toString().equals("3") || mFloorNo.getText().toString().equals("4") ||
+                mFloorNo.getText().toString().equals("5") || mFloorNo.getText().toString().equals("6")){
+            int a = Integer.parseInt(mFloorNo.getText().toString());
+            floorsPosition = new int[a];
+            showMsg();
+        }else{
+            AlertDialog.Builder message = new AlertDialog.Builder(this);
+            message.setTitle("Error");
+            message.setMessage("请输入1-6之间的数字");
+            message.setPositiveButton("OK", null);
+            message.show();
+        }
     }
 
     public void confirmThis() {
-        if (floorsPosition[floorsPosition.length - 1] != 0) {
-            outFloorPosition = thisFloorPosition;
-        }
-        for (int i = 0; i < floorsPosition.length; i++) {
-            if (floorsPosition[i] == 0) {
-                floorsPosition[i] = thisFloorPosition;
-                break;
+        if(floorsPosition.length > 0 && thisFloorPosition >= 0){
+            if (floorsPosition[floorsPosition.length - 1] != 0) {
+                outFloorPosition = thisFloorPosition;
             }
+            for (int i = 0; i < floorsPosition.length; i++) {
+                if (floorsPosition[i] == 0) {
+                    floorsPosition[i] = thisFloorPosition;
+                    break;
+                }
+            }
+            showMsg();
+        }else if(floorsPosition.length <= 0){
+            AlertDialog.Builder message = new AlertDialog.Builder(this);
+            message.setTitle("Error");
+            message.setMessage("请先确认层数");
+            message.setPositiveButton("OK", null);
+            message.show();
+        }else{
+            AlertDialog.Builder message = new AlertDialog.Builder(this);
+            message.setTitle("Error");
+            message.setMessage("请先获取当前格位(通过停止键获取)");
+            message.setPositiveButton("OK", null);
+            message.show();
         }
-        showMsg();
+
     }
 
     public void confirmAll() {
-
-        String tmp = "";
-        for (int aFloorsPosition : floorsPosition) {
-            tmp += aFloorsPosition + " ";
+        if(floorsPosition.length > 0){
+            String tmp = "";
+            for (int aFloorsPosition : floorsPosition) {
+                tmp += aFloorsPosition + " ";
+            }
+            mDao.updateSetting(counter, floorsPosition.length, outFloorPosition,tmp);
         }
-        mDao.updateSetting(counter, floorsPosition.length, outFloorPosition,tmp);
     }
 
     public void deleteLast() {
@@ -273,10 +382,6 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         showMsg();
     }
 
-    public void deleteIt() {
-        floorsPosition = new int[0];
-        outFloorPosition = 0;
-    }
 
     public void showMsg() {
         String str = "";
@@ -360,7 +465,9 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                                             Response += "电机实际动作时间（毫秒）:" + ((rec[10] & 0xff) * 256 + (rec[11] & 0xff)) + "\r\n";
                                             Response += "电机最大电流（毫安）:" + ((rec[12] & 0xff) * 256 + (rec[13] & 0xff)) + "\r\n";
                                             Response += "电机平均电流（毫安）:" + ((rec[14] & 0xff) * 256 + (rec[15] & 0xff)) + "\r\n";
-
+                                            queryStopSuccess = true;
+                                            SystemClock.sleep(10);
+                                            openButton();
                                         }
                                     }
                                 }

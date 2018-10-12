@@ -18,8 +18,8 @@ public class MyOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String MachineInfo_table = "create table MachineInfo(" +
                 "_id integer primary key autoincrement," +
-                "machineID nvarchar(20)," +
-                "version nvarchar(20)," +
+                "machineID nvarchar(100)," +
+                "version nvarchar(100)," +
                 "vmState integer," +
                 "leftState integer," +
                 "rightState integer," +
@@ -135,7 +135,7 @@ public class MyOpenHelper extends SQLiteOpenHelper {
                 "leftFlootNo," +
                 "rightOutPosition, rightFlootPosition," +
                 "rightFlootNo) values (" +
-                "'00000000','ADH816ASV3.0.0.07',0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'',0,0,'',0)";
+                "'00000000','ADH816ASV3.0.0.07',0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,'',0,0,'',0)";
         db.execSQL(MachineInfo);
 
 

@@ -15,10 +15,15 @@ import com.njust.major.dao.impl.MachineStateDaoImpl;
 import com.njust.major.dao.impl.TransactionDaoImpl;
 import com.njust.major.thread.VMMainThread;
 
+import static com.njust.VMApplication.VMMainThreadFlag;
+import static com.njust.VMApplication.mQuery0Flag;
+import static com.njust.VMApplication.mQuery1Flag;
+import static com.njust.VMApplication.mQuery2Flag;
+import static com.njust.VMApplication.mUpdataDatabaseFlag;
+
 
 public class VMService extends Service {
 
-    private VMMainThread mainThread;
     private TransactionDao tDao;
 
     @Override
@@ -34,8 +39,11 @@ public class VMService extends Service {
                 tDao.updateTransaction(transaction);
             }
         }
-        mainThread = new VMMainThread(getApplicationContext());
-        mainThread.start();
+        VMMainThreadFlag = true;
+        mQuery1Flag = true;
+        mQuery2Flag = true;
+        mQuery0Flag = true;
+        mUpdataDatabaseFlag = true;
     }
 
     @Override

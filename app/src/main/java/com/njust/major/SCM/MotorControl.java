@@ -441,24 +441,23 @@ public class MotorControl {
      * @param setTemperature 设定温度，温控门限，-20～70
      * */
     public void counterQuery(int counter ,int zhenNumber, int temperatureMode, int setTemperature) {
-        MotorControlTXBuf = new byte[12];
+        MotorControlTXBuf = new byte[11];
         MotorControlTXBuf[0] = (byte) 0xE2;
-        MotorControlTXBuf[1] = (byte) 0x0C;
+        MotorControlTXBuf[1] = (byte) 0x0B;
         MotorControlTXBuf[2] = (byte) (0xC0+(counter-1));
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x0D;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) 0x65;
-        MotorControlTXBuf[7] = (byte) temperatureMode;
-        MotorControlTXBuf[8] = (byte) ((setTemperature >> 8) & 0xff);
-        MotorControlTXBuf[9] = (byte) (setTemperature & 0xff);
-        MotorControlTXBuf[10] = (byte) 0xF1;
+        MotorControlTXBuf[6] = (byte) temperatureMode;
+        MotorControlTXBuf[7] = (byte) ((setTemperature >> 8) & 0xff);
+        MotorControlTXBuf[8] = (byte) (setTemperature & 0xff);
+        MotorControlTXBuf[9] = (byte) 0xF1;
         int sum = 0;
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 10; i++) {
             sum = sum + MotorControlTXBuf[i];
         }
-        MotorControlTXBuf[11] = (byte)(sum & 0xFF);
-        motorPort.sendData(MotorControlTXBuf, 12);
+        MotorControlTXBuf[10] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 11);
     }
 
 
@@ -475,7 +474,7 @@ public class MotorControl {
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x0D;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) 0x6D;
+        MotorControlTXBuf[6] = (byte) 0x00;
         MotorControlTXBuf[7] = (byte) 0xF1;
         int sum = 0;
         for (int i = 0; i < 8; i++) {

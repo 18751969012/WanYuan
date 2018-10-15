@@ -22,10 +22,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -38,14 +38,13 @@
             android:authorities="com.njust"
             android:exported="true" />
 
-        <service android:name="com.njust.major.service.VMService" />
-        <service android:name=".major.service.OutGoodsService" />
-
-        <receiver android:name=".major.receive.StartReceive">
+        <service android:name="com.njust.major.service.VMService"
+            android:exported="true">
             <intent-filter>
-                <action android:name="Avm.START_BACKGROUND" />
+                <action android:name="android.intent.action.VMService" />
             </intent-filter>
-        </receiver>
+        </service>
+        <service android:name="com.njust.major.service.OutGoodsService" />
 
         <receiver android:name=".major.receive.OutGoodsReceive">
             <intent-filter>

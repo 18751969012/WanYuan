@@ -45,9 +45,9 @@ public class VMMainThread extends Thread {
     private int[] stateOld = new int[32];
     private int delay = 60;
 
-    private int oldLeftDoor = 0;//0=关门1=开门
-    private int oldRightDoor = 0;
-    private int oldMidDoor = 1;
+    private int oldLeftDoor = 1;//1=关门0=开门
+    private int oldRightDoor = 1;
+    private int oldMidDoor = 2;
 
 
 
@@ -115,7 +115,6 @@ public class VMMainThread extends Thread {
                                 state[9] = (int) rec[19];//下货光栅状态，0=正常，1=故障
                                 state[10] = (int) rec[20];//X轴出货光栅状态，0=正常，1=故障
                                 state[11] = (int) rec[21];//出货门开关状态，0=关，1=开，2=半开半关
-                                Util.WriteFile("更新左柜机器状态");
                             }
                         }
                     }
@@ -156,7 +155,6 @@ public class VMMainThread extends Thread {
                                 state[21] = (int) rec[19];//下货光栅状态，0=正常，1=故障
                                 state[22] = (int) rec[20];//X轴出货光栅状态，0=正常，1=故障
                                 state[23] = (int) rec[21];//出货门开关状态，0=关，1=开，2=半开半关
-                                Util.WriteFile("更新右柜机器状态");
                             }
                         }
                     }
@@ -166,11 +164,11 @@ public class VMMainThread extends Thread {
                     SystemClock.sleep(delay);
                     rec = serialPort485.receiveData();
                     if (rec != null && rec.length > 5) {
-                        StringBuilder str1 = new StringBuilder();
-                        for (byte aRec : rec) {
-                            str1.append(Integer.toHexString(aRec & 0xFF)).append(" ");
-                        }
-                        Util.WriteFile("查询中柜机器状态反馈：" + str1);
+//                        StringBuilder str1 = new StringBuilder();
+//                        for (byte aRec : rec) {
+//                            str1.append(Integer.toHexString(aRec & 0xFF)).append(" ");
+//                        }
+//                        Util.WriteFile("查询中柜机器状态反馈：" + str1);
                         if (rec[0] == (byte) 0xE2 && rec[1] == rec.length && rec[2] == 0x00 && rec[4] == (byte) 0x0F && rec[rec.length - 2] == (byte) 0xF1 /*&& isVerify(rec)*/) {
                             if (rec[6] == (byte) 0x6D && rec[3] == (byte) 0xE0) {
                                 state[24] = (int) rec[7];//照明灯状态，0=关，1=开
@@ -181,7 +179,6 @@ public class VMMainThread extends Thread {
                                 state[29] = (int) rec[12];//防夹手光栅状态，0=正常，1=故障
                                 state[30] = (int) rec[13];//取货门开关状态，0=关，1=开，2=半开半关
                                 state[31] = (int) rec[14];//落货门开关状态，0=关，1=开，2=半开半关
-                                Util.WriteFile("更新中柜机器状态");
                             }
                         }
                     }
@@ -197,7 +194,7 @@ public class VMMainThread extends Thread {
                         mDao.updateMeasureTemp(state[0],state[1],state[2],state[6],state[12],state[13],state[14],state[18]);
                         stateOld[0] = state[0]; stateOld[1] = state[1]; stateOld[2] = state[2]; stateOld[6] = state[6];
                         stateOld[12] = state[12]; stateOld[13] = state[13]; stateOld[14] = state[14]; stateOld[18] = state[18];
-                        Util.WriteFile("更新压缩机温度、边柜温度、边柜顶部温度、湿度");
+//                        Util.WriteFile("更新压缩机温度、边柜温度、边柜顶部温度、湿度");
                     }
                     if(stateOld[3] != state[3] || stateOld[4] != state[4] ||
                             stateOld[15] != state[15] || stateOld[16] != state[16]){//压缩机直流风扇状态和边柜直流风扇状态
@@ -228,8 +225,8 @@ public class VMMainThread extends Thread {
                         Util.WriteFile("更新出货门、取货门、落货门开关状态");
                     }
 
-                    if(oldMidDoor != machineState.getMidDoor()){//中柜门
-                        if(machineState.getMidDoor() == 1){//开门
+                    if(oldMidDoor != state[26]){//中柜门
+                        if(state[26] == 0){//开门
                             Intent intent = new Intent();
                             intent.setAction("njust_midDoor_status");
                             intent.putExtra("status", "open");
@@ -242,11 +239,11 @@ public class VMMainThread extends Thread {
                             context.sendBroadcast(intent);
                             Util.WriteFile("关门");
                         }
-                        oldMidDoor = machineState.getMidDoor();
+                        oldMidDoor = state[26];
                     }
                 }
                 VMMainThreadRunning = false;
-                SystemClock.sleep(1000);
+                SystemClock.sleep(100);
             }
             updateZhen();
         }

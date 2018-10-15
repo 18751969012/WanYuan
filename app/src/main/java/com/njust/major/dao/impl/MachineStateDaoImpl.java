@@ -83,7 +83,7 @@ public class MachineStateDaoImpl implements MachineStateDao {
         ContentValues values = new ContentValues();
         values.put("leftLight", leftLight);
         values.put("rightLight", rightLight);
-        values.put("rightLight", midLight);
+        values.put("midLight", midLight);
         int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
     }
 

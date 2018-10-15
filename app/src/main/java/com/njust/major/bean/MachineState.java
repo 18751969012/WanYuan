@@ -20,7 +20,7 @@ public class MachineState {
     private int leftCompressorTemp;//压缩机温度：有符号数（22222为故障）
     private int leftCompressorDCfanState;//压缩机直流风扇状态：0=未启动1=正常2=异常
     private int leftCabinetDCfanState;//边柜直流风扇状态：0=未启动1=正常2=异常
-    private int leftDoor;//门开关状态：0=关门1=开门
+    private int leftDoor;//门开关状态：1=关门0=开门
     private int leftDoorheat;//边柜门加热状态：0=关1=开
     private int leftHumidity;//湿度测量值：100以内代表百分比
     private int leftLight;//照明灯状态：0=关1=开
@@ -35,7 +35,7 @@ public class MachineState {
     private int rightCompressorTemp;//压缩机温度：有符号数（22222为故障）
     private int rightCompressorDCfanState;//压缩机直流风扇状态：0=未启动1=正常2=异常
     private int rightCabinetDCfanState;//边柜直流风扇状态：0=未启动1=正常2=异常
-    private int rightDoor;//门开关状态：0=关门1=开门
+    private int rightDoor;//门开关状态：1=关门0=开门
     private int rightDoorheat;//边柜门加热状态：0=关1=开
     private int rightHumidity;//湿度测量值：100以内代表百分比
     private int rightLight;//照明灯状态：0=关1=开
@@ -45,7 +45,7 @@ public class MachineState {
 
     private int midLight;//中间照明灯状态：0=关1=开
     private int midDoorLock;//中间门锁状态：0=上锁1=开锁
-    private int midDoor;//中间门开关状态：0=关门1=开门
+    private int midDoor;//中间门开关状态：1=关门0=开门
     private int midGetGoodsRaster;//中间取货光栅状态：0=正常1=故障
     private int midDropGoodsRaster;//中间落货光栅状态：0=正常1=故障
     private int midAntiPinchHandRaster;//中间防夹手光栅状态：0=正常1=故障

@@ -6,6 +6,7 @@ import android.os.Environment;
 
 import com.njust.major.database.MyOpenHelper;
 import com.njust.major.thread.VMMainThread;
+import com.njust.major.util.Util;
 
 import java.io.File;
 
@@ -38,6 +39,7 @@ public class VMApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Util.WriteFile("VMApplication启动");
 		MyCrashHandler myCrashHandler = MyCrashHandler.getInstance();
 		myCrashHandler.init(getApplicationContext());
 		MyOpenHelper myOpenHelper = new MyOpenHelper(getApplicationContext());
@@ -46,6 +48,7 @@ public class VMApplication extends Application {
 		mainThread = new VMMainThread(getApplicationContext());
 		mainThread.initMainThread();
 		mainThread.start();
+		Util.WriteFile("主线程启动");
 	}
 
 }

@@ -14,6 +14,7 @@ import com.njust.major.dao.TransactionDao;
 import com.njust.major.dao.impl.MachineStateDaoImpl;
 import com.njust.major.dao.impl.TransactionDaoImpl;
 import com.njust.major.thread.VMMainThread;
+import com.njust.major.util.Util;
 
 import static com.njust.VMApplication.VMMainThreadFlag;
 import static com.njust.VMApplication.mQuery0Flag;
@@ -29,7 +30,8 @@ public class VMService extends Service {
     @Override
     public void onCreate(){
         super.onCreate();
-        Log.w("happy", "主线程开启");
+        Log.w("happy", "VMService启动");
+        Util.WriteFile("VMService启动");
         updateVersion();
         tDao = new TransactionDaoImpl(getApplicationContext());
         Transaction transaction = tDao.queryLastedTransaction();

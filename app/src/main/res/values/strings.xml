@@ -1,3 +1,83 @@
 <resources>
     <string name="app_name">WanYuan</string>
+
+    <string name="temp_control_huicha">温控回差</string>
+
+    <string name="compressor_max_continuous_worktime">压缩机最长连续工作时间</string>
+
+    <string name="user_defined_open">温度回差、压缩机工作时长 自定义开启</string>
+
+    <string name="user_defined_close">温度回差、压缩机工作时长 自定义关闭</string>
+
+    <string name="left_counter">左柜</string>
+
+    <string name="right_counter">右柜</string>
+
+    <string name="mid_counter">中柜</string>
+
+    <string name="left_fast_up">快升</string>
+
+    <string name="left_slow_up">慢升</string>
+
+    <string name="left_fast_down">快降</string>
+
+    <string name="left_slow_down">慢降</string>
+
+    <string name="left_stop">停止</string>
+
+    <string name="left_query_Y">查询当前格位</string>
+
+    <string name="left_please_input_grid_position">请输入码盘格位</string>
+
+    <string name="left_move_Y">云台移动</string>
+
+    <string name="right_fast_up">快升</string>
+
+    <string name="right_slow_up">慢升</string>
+
+    <string name="right_fast_down">快降</string>
+
+    <string name="right_slow_down">慢降</string>
+
+    <string name="right_stop">停止</string>
+
+    <string name="right_query_Y">查询当前格位</string>
+
+    <string name="right_please_input_grid_position">请输入码盘格位</string>
+
+    <string name="right_move_Y">云台移动</string>
+
+    <string name="left_floot_position">左柜每层的码盘位置</string>
+
+    <string name="left_out_position">左出货口位置：</string>
+
+    <string name="right_floot_position">右柜每层的码盘位置</string>
+
+    <string name="right_out_position">右出货口位置：</string>
+
+    <string name="Null">null</string>
+
+    <string name="left_floot_position_1">一:null</string>
+
+    <string name="left_floot_position_2">二:null</string>
+
+    <string name="left_floot_position_3">三:null</string>
+
+    <string name="left_floot_position_4">四:null</string>
+
+    <string name="left_floot_position_5">五:null</string>
+
+    <string name="left_floot_position_6">六:null</string>
+
+    <string name="right_floot_position_1">一:null</string>
+
+    <string name="right_floot_position_2">二:null</string>
+
+    <string name="right_floot_position_3">三:null</string>
+
+    <string name="right_floot_position_4">四:null</string>
+
+    <string name="right_floot_position_5">五:null</string>
+
+    <string name="right_floot_position_6">六:null</string>
 </resources>

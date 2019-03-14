@@ -31,14 +31,14 @@
             android:id="@+id/row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="行(0代表所有行)"
+            android:hint="行(1-10)"
             android:text=""/>
 
         <EditText
             android:id="@+id/column"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="列(0代表所有列)"
+            android:hint="列(1-10)"
             android:text=""/>
 
         <Button
@@ -52,6 +52,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="货道电机信息" />
+
+        <Button
+            android:id="@+id/houdao_motor_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="按行测试" />
+
+        <Button
+            android:id="@+id/houdao_motor_column"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="按列测试" />
+
+        <Button
+            android:id="@+id/houdao_motor_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="所有电机" />
+
+        <EditText
+            android:id="@+id/positionID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入测试的货道号(空格隔开)"
+            android:text=""/>
+        <Button
+            android:id="@+id/test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="模拟出货" />
+
 
     </LinearLayout>
 
@@ -132,6 +163,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="履带电机信息" />
+
     </LinearLayout>
 
 

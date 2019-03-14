@@ -12,6 +12,7 @@ public class Malfunction {
     private int motorMaxElectricity;//电机最大电流（毫安）
     private int motorAverageElectricity;//电机平均电流（毫安）
 
+
     public Malfunction(int _id, String transactionID,String errorTime, int counter, String errorModule, String errorDescription, int motorRealActionTime, int motorMaxElectricity, int motorAverageElectricity) {
         this._id = _id;
         this.transactionID = transactionID;

@@ -98,7 +98,6 @@ public class VMProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         int code = sURIMatcher.match(uri);
         if (code == TINSERTSUCESS) {
-            Log.w("happy", "provider开始了！！！！！！！！！！");
             long insert = sqldb.insert("TransactionInfo", null, values);
             getContext().getContentResolver().notifyChange(uri, null);
             Uri uri2 = Uri.parse("insert/" + insert);

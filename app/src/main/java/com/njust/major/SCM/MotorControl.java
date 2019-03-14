@@ -63,6 +63,37 @@ public class MotorControl {
         motorPort.sendData(MotorControlTXBuf, 10);
     }
 
+    /**
+     * 垂直移层_移到指定格位
+     * 说明：用于测试指令
+     * @param counter 货柜号 1=左柜（主柜），2 =右柜（辅柜）
+     * @param zhenNumber 本帧编号
+     * @param position 码盘格位
+     * */
+    public void moveFloorByMapan(int counter ,int zhenNumber ,int position) {
+        MotorControlTXBuf = new byte[10];
+        MotorControlTXBuf[0] = (byte) 0xE2;
+        MotorControlTXBuf[1] = (byte) 0x0A;
+        MotorControlTXBuf[2] = (byte) (0xC0+(counter-1));
+        MotorControlTXBuf[3] = (byte) 0x00;
+        MotorControlTXBuf[4] = (byte) 0x01;
+        MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
+        if(counter == 1){
+            MotorControlTXBuf[6] = (byte) ((position >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) (position & 0xFF);
+        }else{
+            MotorControlTXBuf[6] = (byte) ((position >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) (position & 0xFF);
+        }
+        MotorControlTXBuf[8] = (byte) 0xF1;
+        int sum = 0;
+        for (int i = 0; i <9; i++) {
+            sum = sum + MotorControlTXBuf[i];
+        }
+        MotorControlTXBuf[9] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 10);
+    }
+
 
     /**
      * 垂直移层_出货口指令
@@ -85,6 +116,38 @@ public class MotorControl {
         }else{
             MotorControlTXBuf[6] = (byte) ((queryMachineState.getRightOutPosition() >> 8) & 0xFF);
             MotorControlTXBuf[7] = (byte) (queryMachineState.getRightOutPosition() & 0xFF);
+        }
+        MotorControlTXBuf[8] = (byte) 0xF1;
+        int sum = 0;
+        for (int i = 0; i <9; i++) {
+            sum = sum + MotorControlTXBuf[i];
+        }
+        MotorControlTXBuf[9] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 10);
+    }
+
+    /**
+     * 垂直移层_出货口（校正）指令
+     * 说明：边柜板驱动Y电机升降云台到出货口下方一定的距离位置，用于折返调整Y轴移动误差
+     * @param counter 货柜号 1=左柜（主柜），2 =右柜（辅柜）
+     * @param zhenNumber 本帧编号
+     * @param encoder 出货口下方一定的距离位置，代表码盘数量
+     * */
+    public void moveFloorOutRevise(int counter ,int zhenNumber,int encoder) {
+        MachineState queryMachineState = mDao.queryMachineState();
+        MotorControlTXBuf = new byte[10];
+        MotorControlTXBuf[0] = (byte) 0xE2;
+        MotorControlTXBuf[1] = (byte) 0x0A;
+        MotorControlTXBuf[2] = (byte) (0xC0+(counter-1));
+        MotorControlTXBuf[3] = (byte) 0x00;
+        MotorControlTXBuf[4] = (byte) 0x01;
+        MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
+        if(counter == 1){
+            MotorControlTXBuf[6] = (byte) (((queryMachineState.getLeftOutPosition() - encoder) >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) ((queryMachineState.getLeftOutPosition() - encoder) & 0xFF);
+        }else{
+            MotorControlTXBuf[6] = (byte) (((queryMachineState.getRightOutPosition()- encoder) >> 8) & 0xFF);
+            MotorControlTXBuf[7] = (byte) ((queryMachineState.getRightOutPosition()- encoder) & 0xFF);
         }
         MotorControlTXBuf[8] = (byte) 0xF1;
         int sum = 0;
@@ -167,9 +230,9 @@ public class MotorControl {
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x03;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) (p1.getPosition1() / 16);
-        MotorControlTXBuf[7] = (byte) (p1.getPosition1() % 16);
-        MotorControlTXBuf[8] = (byte) (p1.getPosition2() % 16);
+        MotorControlTXBuf[6] = (byte) ((p1.getPosition1() / 16)-1);
+        MotorControlTXBuf[7] = (byte) ((p1.getPosition1() % 16)-1);
+        MotorControlTXBuf[8] = (byte) ((p1.getPosition2() % 16)-1);
         MotorControlTXBuf[9] = (byte) p1.getMotorType();
         MotorControlTXBuf[10] = (byte) 0xF1;
         int sum = 0;
@@ -379,22 +442,21 @@ public class MotorControl {
      * @param code 1=开启照明灯，2=关闭照明灯，3=开启电磁锁
      * */
     public void centerCommand(int zhenNumber ,int code) {
-        MotorControlTXBuf = new byte[10];
+        MotorControlTXBuf = new byte[9];
         MotorControlTXBuf[0] = (byte) 0xE2;
-        MotorControlTXBuf[1] = (byte) 0x0A;
+        MotorControlTXBuf[1] = (byte) 0x09;
         MotorControlTXBuf[2] = (byte) 0xE0;
         MotorControlTXBuf[3] = (byte) 0x00;
         MotorControlTXBuf[4] = (byte) 0x0B;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
-        MotorControlTXBuf[6] = (byte) 0x35;
-        MotorControlTXBuf[7] = (byte) code;
-        MotorControlTXBuf[8] = (byte) 0xF1;
+        MotorControlTXBuf[6] = (byte) code;
+        MotorControlTXBuf[7] = (byte) 0xF1;
         int sum = 0;
         for (int i = 0; i < 9; i++) {
             sum = sum + MotorControlTXBuf[i];
         }
-        MotorControlTXBuf[9] = (byte)(sum & 0xFF);
-        motorPort.sendData(MotorControlTXBuf, 10);
+        MotorControlTXBuf[8] = (byte)(sum & 0xFF);
+        motorPort.sendData(MotorControlTXBuf, 9);
     }
 
 
@@ -419,8 +481,8 @@ public class MotorControl {
         MotorControlTXBuf[4] = (byte) 0x0C;
         MotorControlTXBuf[5] = (byte) (zhenNumber & 0xFF);
         MotorControlTXBuf[6] = (byte) code;
-        MotorControlTXBuf[7] = (byte) floor;
-        MotorControlTXBuf[8] = (byte) column;
+        MotorControlTXBuf[7] = (byte) (floor-1);
+        MotorControlTXBuf[8] = (byte) (column-1);
         MotorControlTXBuf[9] = (byte) 0;
         MotorControlTXBuf[10] = (byte) 0xF1;
         int sum = 0;

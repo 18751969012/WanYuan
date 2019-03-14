@@ -58,38 +58,38 @@ public class ChangeSettingReceive extends BroadcastReceiver {
         dao.updateTemperature(Integer.parseInt(leftTempState),Integer.parseInt(leftSetTemp),Integer.parseInt(rightTempState),Integer.parseInt(rightSetTemp));
         if(open_mid.equals("1")){
             motorControl.centerCommand(midZNum++, 1);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }else{
             motorControl.centerCommand(midZNum++, 2);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }
         if(open_left.equals("1")){
             motorControl.counterCommand(1, rimZNum1++, 1);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }else{
             motorControl.counterCommand(1, rimZNum1++, 2);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }
         if(open_right.equals("1")){
             motorControl.counterCommand(2, rimZNum1++, 1);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }else{
             motorControl.counterCommand(2, rimZNum1++, 2);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }
         if(heat_left.equals("1")){
             motorControl.counterCommand(1, rimZNum1++, 3);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }else{
             motorControl.counterCommand(1, rimZNum1++, 4);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }
         if(heat_right.equals("1")){
             motorControl.counterCommand(2, rimZNum2++, 3);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }else{
             motorControl.counterCommand(2, rimZNum2++, 4);
-            SystemClock.sleep(5);
+            SystemClock.sleep(10);
         }
 
         VMMainThreadFlag = true;

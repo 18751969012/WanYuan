@@ -1,160 +1,646 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_weight="4"
-    android:orientation="horizontal"
-    android:weightSum="8">
-
+    android:layout_height="match_parent"
+    android:layout_marginBottom="50dp"
+    android:orientation="horizontal">
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:orientation="vertical">
-        <Button
-            android:id="@+id/fast_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="快速上升" />
-
-        <Button
-            android:id="@+id/slow_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="慢速上升" />
-
-        <Button
-            android:id="@+id/fast_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="快速下降" />
-
-        <Button
-            android:id="@+id/slow_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="慢速下降" />
-
-        <Button
-            android:id="@+id/stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="停       止" />
-
-        <TextView
-            android:id="@+id/the_msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
-            android:text="当前格位" />
-
-        <Button
-            android:id="@+id/confirm_this"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="确认格位" />
-
-        <EditText
-            android:id="@+id/manuel_floor_no"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="0" />
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/left_counter"
+                android:textSize="30sp" />
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:orientation="vertical"
+            android:gravity="center">
+            <Button
+                android:id="@+id/left_fast_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_fast_up" />
+            <Button
+                android:id="@+id/left_slow_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_slow_up" />
+            <Button
+                android:id="@+id/left_fast_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_fast_down" />
+            <Button
+                android:id="@+id/left_slow_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_slow_down" />
+            <Button
+                android:id="@+id/left_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_stop" />
+            <Button
+                android:id="@+id/left_query_Y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_query_Y" />
 
-        <Button
-            android:id="@+id/manuel_confirm_floor_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="手动输入位置" />
+            <EditText
+                android:id="@+id/left_grid_position_ET"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="0" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:gravity="center">
+            <EditText
+                android:id="@+id/left_please_input_grid_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:hint="@string/left_please_input_grid_position"
+                android:inputType="number"
+                android:text=""/>
+            <Button
+                android:id="@+id/left_move_Y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_move_Y" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:orientation="vertical"
+            android:gravity="center">
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="2"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/change_counter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="更改货柜" />
-
-        <TextView
-            android:id="@+id/now_counter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="当前为左货柜" />
-
-        <EditText
-            android:id="@+id/floor_no"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:hint="请输入层数(1-6)"
-            android:text=""/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/info_TV"
+                    android:layout_width="350dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="false"/>
+            </RelativeLayout>
 
-        <Button
-            android:id="@+id/confirm_floor_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="确认层数" />
-
-        <TextView
-            android:id="@+id/floor_msg"
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp" />
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="7"
+                        android:orientation="vertical">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/left_floot_position" />
+                        </RelativeLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:orientation="horizontal">
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_floot_position_1"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_floot_position_1" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_floot_position_2"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_floot_position_2" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_floot_position_3"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_floot_position_3" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_out_position" />
+                                </RelativeLayout>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_floot_position_4"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_floot_position_4" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_floot_position_5"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_floot_position_5" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_floot_position_6"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/left_floot_position_6" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/left_out_position"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="null" />
+                                </RelativeLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="7"
+                        android:orientation="vertical">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@string/right_floot_position" />
+                        </RelativeLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="6"
+                            android:orientation="horizontal">
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_floot_position_1"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_floot_position_1" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_floot_position_2"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_floot_position_2" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_floot_position_3"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_floot_position_3" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_out_position" />
+                                </RelativeLayout>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center">
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_floot_position_4"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_floot_position_4" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_floot_position_5"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_floot_position_5" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_floot_position_6"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="@string/right_floot_position_6" />
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:id="@+id/right_out_position"
+                                        android:layout_width="80dp"
+                                        android:layout_height="30dp"
+                                        android:gravity="center"
+                                        android:text="null" />
+                                </RelativeLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                <Button
+                    android:id="@+id/confirm_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="保存到数据库" />
+                <Button
+                    android:id="@+id/test_activity_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="进入测试界面"/>
+                <Button
+                    android:id="@+id/return_back_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="返回"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:orientation="vertical">
+               <!-- <EditText
+                    android:id="@+id/delay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="延时时间"
+                    android:text=""/>
+                <Button
+                    android:id="@+id/delayButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确认延时时间" />-->
+                <TextView
+                    android:id="@+id/diplay_seleted_item_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="请选择宽履带货道连线方式"/>
 
-        <Button
-            android:id="@+id/delete_last"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="删除最后一个" />
+                <RadioGroup
+                    android:id="@+id/rg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/delete_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="清空" />
+                    <RadioButton
+                        android:id="@+id/ten_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="都采用10货道线" />
 
-        <Button
-            android:id="@+id/confirm_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="确认保存" />
-        <Button
-            android:id="@+id/test_activity_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="进入测试界面"/>
-        <Button
-            android:id="@+id/return_back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="返回"/>
-        <!--<Button-->
-            <!--android:id="@+id/position_activity_button"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="进入位置设置界面"/>-->
+                    <RadioButton
+                        android:id="@+id/five_line"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="宽履带用5货道线"/>
+                </RadioGroup>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginTop="20dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/temp_control_huicha"/>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/temp_minus_TV"
+                            android:gravity="center"
+                            android:textStyle="bold"
+                            android:background="@drawable/shop_button_minus"
+                            android:layout_width="23dp"
+                            android:layout_height="23dp" />
+                        <TextView
+                            android:id="@+id/temp_setting"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="1.0"/>
+                        <TextView
+                            android:id="@+id/temp_add_TV"
+                            android:textStyle="bold"
+                            android:background="@drawable/shop_button_add"
+                            android:layout_width="23dp"
+                            android:layout_height="23dp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/compressor_max_continuous_worktime" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+                        <EditText
+                            android:id="@+id/compressor_max_continuous_worktime"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:hint="1-10小时"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <Button
+                        android:id="@+id/user_defined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/user_defined_close"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/ele"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
-
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/right_counter"
+                android:textSize="30sp" />
 
-        <TextView
-            android:id="@+id/y_motor_msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Y电机信息" />
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:orientation="vertical"
+            android:gravity="center">
+            <Button
+                android:id="@+id/right_fast_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_fast_up" />
+            <Button
+                android:id="@+id/right_slow_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_slow_up" />
+            <Button
+                android:id="@+id/right_fast_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_fast_down" />
+            <Button
+                android:id="@+id/right_slow_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_slow_down" />
+            <Button
+                android:id="@+id/right_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_stop" />
+            <Button
+                android:id="@+id/right_query_Y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_query_Y" />
 
-
-
-
+            <EditText
+                android:id="@+id/right_grid_position_ET"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="0" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:gravity="center">
+            <EditText
+                android:id="@+id/right_please_input_grid_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/right_please_input_grid_position"
+                android:inputType="number"
+                android:gravity="center"
+                android:text=""/>
+            <Button
+                android:id="@+id/right_move_Y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right_move_Y" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:orientation="vertical"
+            android:gravity="center">
+        </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

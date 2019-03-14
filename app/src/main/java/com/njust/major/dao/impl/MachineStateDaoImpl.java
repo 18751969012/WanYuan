@@ -60,17 +60,19 @@ public class MachineStateDaoImpl implements MachineStateDao {
 
 
     @Override
-    public void updateMeasureTemp(int leftCompressorTemp, int leftCabinetTemp, int leftCabinetTopTemp, int leftHumidity,
-                                  int rightCompressorTemp, int rightCabinetTemp,int rightCabinetTopTemp, int rightHumidity) {
+    public void updateMeasureTemp(int leftCompressorTemp, int leftCabinetTemp, int leftCabinetTopTemp, int leftOutCabinetTemp, int leftHumidity,
+                                  int rightCompressorTemp, int rightCabinetTemp,int rightCabinetTopTemp, int rightOutCabinetTemp, int rightHumidity) {
         Uri uri = Uri.parse("content://com.njust/Mupdate");
         ContentValues values = new ContentValues();
         values.put("leftCompressorTemp", leftCompressorTemp);
         values.put("leftCabinetTemp", leftCabinetTemp);
         values.put("leftCabinetTopTemp", leftCabinetTopTemp);
+        values.put("leftOutCabinetTemp", leftOutCabinetTemp);
         values.put("leftHumidity", leftHumidity);
         values.put("rightCompressorTemp", rightCompressorTemp);
         values.put("rightCabinetTemp", rightCabinetTemp);
         values.put("rightCabinetTopTemp", rightCabinetTopTemp);
+        values.put("rightOutCabinetTemp", rightOutCabinetTemp);
         values.put("rightHumidity", rightHumidity);
         int update = context.getContentResolver().update(uri, values, "_id=?",
                 new String[] { "1" });
@@ -113,9 +115,9 @@ public class MachineStateDaoImpl implements MachineStateDao {
     }
 
     @Override
-    public void updateDoorState(int leftDoor, int rightDoor,  int midDoor, int midDoorLock) {
-        String sql1 = "update MachineInfo set leftDoor=?, rightDoor=? , midDoor=? , midDoorLock=? where _id =1";
-        Object[] bindArgs1 = new Object[] { "" + leftDoor + "" + rightDoor + "" + midDoor +  "" + midDoorLock };
+    public void updateDoorState(int midDoor, int midDoorLock) {
+        String sql1 = "update MachineInfo set midDoor=? , midDoorLock=? where _id =1";
+        Object[] bindArgs1 = new Object[] { "" + midDoor +  "" + midDoorLock };
         db.execSQL(sql1, bindArgs1);
     }
 
@@ -152,6 +154,87 @@ public class MachineStateDaoImpl implements MachineStateDao {
     }
 
     @Override
+    public void updateFan(int leftTempControlAlternatPower, int leftRefrigerationCompressorState, int leftCompressorFanState, int leftHeatingWireState, int leftRecirculatAirFanState,
+                          int rightTempControlAlternatPower, int rightRefrigerationCompressorState, int rightCompressorFanState, int rightHeatingWireState, int rightRecirculatAirFanState) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("leftTempControlAlternatPower", leftTempControlAlternatPower);
+        values.put("leftRefrigerationCompressorState", leftRefrigerationCompressorState);
+        values.put("leftCompressorFanState", leftCompressorFanState);
+        values.put("leftHeatingWireState", leftHeatingWireState);
+        values.put("leftRecirculatAirFanState", leftRecirculatAirFanState);
+        values.put("rightTempControlAlternatPower", rightTempControlAlternatPower);
+        values.put("rightRefrigerationCompressorState", rightRefrigerationCompressorState);
+        values.put("rightCompressorFanState", rightCompressorFanState);
+        values.put("rightHeatingWireState", rightHeatingWireState);
+        values.put("rightRecirculatAirFanState", rightRecirculatAirFanState);
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+    @Override
+    public void updateYState( int counter, int liftPlatformDownSwitch, int liftPlatformUpSwitch) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        if(counter == 1){
+            values.put("leftLiftPlatformDownSwitch", liftPlatformDownSwitch);
+            values.put("leftLiftPlatformUpSwitch", liftPlatformUpSwitch);
+        }else{
+            values.put("rightLiftPlatformDownSwitch", liftPlatformDownSwitch);
+            values.put("rightLiftPlatformUpSwitch", liftPlatformUpSwitch);
+        }
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+    @Override
+    public void updatePushGoodsRaster(int counter, int pushGoodsRaster) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        if(counter == 1){
+            values.put("leftPushGoodsRasterImmediately", pushGoodsRaster);
+        }else{
+            values.put("rightPushGoodsRasterImmediately", pushGoodsRaster);
+        }
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+    @Override
+    public void updateOutGoodsRaster(int counter, int outGoodsRaster) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        if(counter == 1){
+            values.put("leftOutGoodsRasterImmediately", outGoodsRaster);
+        }else{
+            values.put("rightOutGoodsRasterImmediately", outGoodsRaster);
+        }
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+    @Override
+    public void updateOutGoodsDoorSwitch(int counter, int outGoodsDoorDownSwitch, int outGoodsDoorUpSwitch) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        if(counter == 1){
+            values.put("leftOutGoodsDoorDownSwitch", outGoodsDoorDownSwitch);
+            values.put("leftOutGoodsDoorUpSwitch", outGoodsDoorUpSwitch);
+        }else{
+            values.put("rightOutGoodsDoorDownSwitch", outGoodsDoorDownSwitch);
+            values.put("rightOutGoodsDoorUpSwitch", outGoodsDoorUpSwitch);
+        }
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+    @Override
+    public void updateGetGoodsDoorSwitch(int getGoodsDoorDownSwitch, int getGoodsDoorUpSwitch) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("midGetDoorDownSwitch", getGoodsDoorDownSwitch);
+        values.put("midGetDoorUpSwitch", getGoodsDoorUpSwitch);
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+    @Override
+    public void updateElectricQuantity(int electricQuantity) {
+        Uri uri = Uri.parse("content://com.njust/Mupdate");
+        ContentValues values = new ContentValues();
+        values.put("electricQuantity", electricQuantity);
+        int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
+    }
+
+    @Override
     public void updateMachineState(MachineState machineState) {
         Uri uri = Uri.parse("content://com.njust/Mupdate");
         ContentValues values = new ContentValues();
@@ -167,7 +250,7 @@ public class MachineStateDaoImpl implements MachineStateDao {
         values.put("leftCompressorTemp", machineState.getLeftCompressorTemp());
         values.put("leftCompressorDCfanState", machineState.getLeftCompressorDCfanState());
         values.put("leftCabinetDCfanState", machineState.getLeftCabinetDCfanState());
-        values.put("leftDoor", machineState.getLeftDoor());
+        values.put("leftOutCabinetTemp", machineState.getLeftOutCabinetTemp());
         values.put("leftDoorheat", machineState.getLeftDoorheat());
         values.put("leftHumidity", machineState.getLeftHumidity());
         values.put("leftLight", machineState.getLeftLight());
@@ -182,7 +265,7 @@ public class MachineStateDaoImpl implements MachineStateDao {
         values.put("rightCompressorTemp", machineState.getRightCompressorTemp());
         values.put("rightCompressorDCfanState", machineState.getRightCompressorDCfanState());
         values.put("rightCabinetDCfanState", machineState.getRightCabinetDCfanState());
-        values.put("rightDoor", machineState.getRightDoor());
+        values.put("rightOutCabinetTemp", machineState.getRightOutCabinetTemp());
         values.put("rightDoorheat", machineState.getRightDoorheat());
         values.put("rightHumidity", machineState.getRightHumidity());
         values.put("rightLight", machineState.getRightLight());
@@ -198,6 +281,46 @@ public class MachineStateDaoImpl implements MachineStateDao {
         values.put("midAntiPinchHandRaster", machineState.getMidAntiPinchHandRaster());
         values.put("midGetDoor", machineState.getMidGetDoor());
         values.put("midDropDoor", machineState.getMidDropDoor());
+        
+        //更新单片机通讯协议后新加的字段
+        values.put("leftTempControlAlternatPower", machineState.getLeftTempControlAlternatPower());
+        values.put("leftRefrigerationCompressorState", machineState.getLeftRefrigerationCompressorState());
+        values.put("leftCompressorFanState", machineState.getLeftCompressorFanState());
+        values.put("leftHeatingWireState", machineState.getLeftHeatingWireState());
+        values.put("leftRecirculatAirFanState", machineState.getLeftRecirculatAirFanState());
+        
+        values.put("leftLiftPlatformDownSwitch", machineState.getLeftLiftPlatformDownSwitch());
+        values.put("leftLiftPlatformUpSwitch", machineState.getLeftLiftPlatformUpSwitch());
+        values.put("leftLiftPlatformOutGoodsSwitch", machineState.getLeftLiftPlatformOutGoodsSwitch());
+        values.put("leftOutGoodsRasterImmediately", machineState.getLeftOutGoodsRasterImmediately());
+        values.put("leftPushGoodsRasterImmediately", machineState.getLeftPushGoodsRasterImmediately());
+        values.put("leftMotorFeedbackState1", machineState.getLeftMotorFeedbackState1());
+        values.put("leftMotorFeedbackState2", machineState.getLeftMotorFeedbackState2());
+        values.put("leftOutGoodsDoorDownSwitch", machineState.getLeftOutGoodsDoorDownSwitch());
+        values.put("leftOutGoodsDoorUpSwitch", machineState.getLeftOutGoodsDoorUpSwitch());
+
+        values.put("rightTempControlAlternatPower", machineState.getRightTempControlAlternatPower());
+        values.put("rightRefrigerationCompressorState", machineState.getRightRefrigerationCompressorState());
+        values.put("rightCompressorFanState", machineState.getRightCompressorFanState());
+        values.put("rightHeatingWireState", machineState.getRightHeatingWireState());
+        values.put("rightRecirculatAirFanState", machineState.getRightRecirculatAirFanState());
+
+        values.put("rightLiftPlatformDownSwitch", machineState.getRightLiftPlatformDownSwitch());
+        values.put("rightLiftPlatformUpSwitch", machineState.getRightLiftPlatformUpSwitch());
+        values.put("rightLiftPlatformOutGoodsSwitch", machineState.getRightLiftPlatformOutGoodsSwitch());
+        values.put("rightOutGoodsRasterImmediately", machineState.getRightOutGoodsRasterImmediately());
+        values.put("rightPushGoodsRasterImmediately", machineState.getRightPushGoodsRasterImmediately());
+        values.put("rightMotorFeedbackState1", machineState.getRightMotorFeedbackState1());
+        values.put("rightMotorFeedbackState2", machineState.getRightMotorFeedbackState2());
+        values.put("rightOutGoodsDoorDownSwitch", machineState.getRightOutGoodsDoorDownSwitch());
+        values.put("rightOutGoodsDoorUpSwitch", machineState.getRightOutGoodsDoorUpSwitch());
+
+        values.put("midGetDoorWaitClose", machineState.getMidGetDoorWaitClose());
+        values.put("midGetDoorDownSwitch", machineState.getMidGetDoorDownSwitch());
+        values.put("midGetDoorUpSwitch", machineState.getMidGetDoorUpSwitch());
+        values.put("midDropDoorDownSwitch", machineState.getMidDropDoorDownSwitch());
+        values.put("midDropDoorUpSwitch", machineState.getMidDropDoorUpSwitch());
+        values.put("electricQuantity", machineState.getElectricQuantity());
         int update = context.getContentResolver().update(uri, values, "_id = ?", new String[]{"1"});
     }
 
@@ -223,7 +346,7 @@ public class MachineStateDaoImpl implements MachineStateDao {
             machineState.setLeftCompressorTemp(cursor.getInt(10));
             machineState.setLeftCompressorDCfanState(cursor.getInt(11));
             machineState.setLeftCabinetDCfanState(cursor.getInt(12));
-            machineState.setLeftDoor(cursor.getInt(13));
+            machineState.setLeftOutCabinetTemp(cursor.getInt(13));
             machineState.setLeftDoorheat(cursor.getInt(14));
             machineState.setLeftHumidity(cursor.getInt(15));
             machineState.setLeftLight(cursor.getInt(16));
@@ -238,7 +361,7 @@ public class MachineStateDaoImpl implements MachineStateDao {
             machineState.setRightCompressorTemp(cursor.getInt(24));
             machineState.setRightCompressorDCfanState(cursor.getInt(25));
             machineState.setRightCabinetDCfanState(cursor.getInt(26));
-            machineState.setRightDoor(cursor.getInt(27));
+            machineState.setRightOutCabinetTemp(cursor.getInt(27));
             machineState.setRightDoorheat(cursor.getInt(28));
             machineState.setRightHumidity(cursor.getInt(29));
             machineState.setRightLight(cursor.getInt(30));
@@ -262,6 +385,45 @@ public class MachineStateDaoImpl implements MachineStateDao {
             machineState.setRightFlootPosition(cursor.getString(46));
             machineState.setRightFlootNo(cursor.getInt(47));
 
+            //更新单片机通讯协议后新加的字段
+            machineState.setLeftTempControlAlternatPower(cursor.getInt(48));
+            machineState.setLeftRefrigerationCompressorState(cursor.getInt(49));
+            machineState.setLeftCompressorFanState(cursor.getInt(50));
+            machineState.setLeftHeatingWireState(cursor.getInt(51));
+            machineState.setLeftRecirculatAirFanState(cursor.getInt(52));
+
+            machineState.setLeftLiftPlatformDownSwitch(cursor.getInt(53));
+            machineState.setLeftLiftPlatformUpSwitch(cursor.getInt(54));
+            machineState.setLeftLiftPlatformOutGoodsSwitch(cursor.getInt(55));
+            machineState.setLeftOutGoodsRasterImmediately(cursor.getInt(56));
+            machineState.setLeftPushGoodsRasterImmediately(cursor.getInt(57));
+            machineState.setLeftMotorFeedbackState1(cursor.getInt(58));
+            machineState.setLeftMotorFeedbackState2(cursor.getInt(59));
+            machineState.setLeftOutGoodsDoorDownSwitch(cursor.getInt(60));
+            machineState.setLeftOutGoodsDoorUpSwitch(cursor.getInt(61));
+
+            machineState.setRightTempControlAlternatPower(cursor.getInt(62));
+            machineState.setRightRefrigerationCompressorState(cursor.getInt(63));
+            machineState.setRightCompressorFanState(cursor.getInt(64));
+            machineState.setRightHeatingWireState(cursor.getInt(65));
+            machineState.setRightRecirculatAirFanState(cursor.getInt(66));
+
+            machineState.setRightLiftPlatformDownSwitch(cursor.getInt(67));
+            machineState.setRightLiftPlatformUpSwitch(cursor.getInt(68));
+            machineState.setRightLiftPlatformOutGoodsSwitch(cursor.getInt(69));
+            machineState.setRightOutGoodsRasterImmediately(cursor.getInt(70));
+            machineState.setRightPushGoodsRasterImmediately(cursor.getInt(71));
+            machineState.setRightMotorFeedbackState1(cursor.getInt(72));
+            machineState.setRightMotorFeedbackState2(cursor.getInt(73));
+            machineState.setRightOutGoodsDoorDownSwitch(cursor.getInt(74));
+            machineState.setRightOutGoodsDoorUpSwitch(cursor.getInt(75));
+
+            machineState.setMidGetDoorWaitClose(cursor.getInt(76));
+            machineState.setMidGetDoorDownSwitch(cursor.getInt(77));
+            machineState.setMidGetDoorUpSwitch(cursor.getInt(78));
+            machineState.setMidDropDoorDownSwitch(cursor.getInt(79));
+            machineState.setMidDropDoorUpSwitch(cursor.getInt(80));
+            machineState.setElectricQuantity(cursor.getInt(81));
             cursor.close();
         }
         return machineState;

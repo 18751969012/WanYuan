@@ -33,6 +33,10 @@ public class Constant {
 	public static int queryCloseOutGoodsDoor = 13;
 	/**查询云台归位*/
 	public static int queryHoming = 14;
+	/**移层_出货口位置（折返动作校正传送带导致的Y轴误差）*/
+	public static int moveFloorOutRevise = 15;
+	/**查询移层_出货口位置（折返动作校正传送带导致的Y轴误差）*/
+	public static int queryMoveFloorOutRevise = 16;
 
 
 

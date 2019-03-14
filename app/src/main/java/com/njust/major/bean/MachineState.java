@@ -20,9 +20,9 @@ public class MachineState {
     private int leftCompressorTemp;//压缩机温度：有符号数（22222为故障）
     private int leftCompressorDCfanState;//压缩机直流风扇状态：0=未启动1=正常2=异常
     private int leftCabinetDCfanState;//边柜直流风扇状态：0=未启动1=正常2=异常
-    private int leftDoor;//门开关状态：1=关门0=开门
+    private int leftOutCabinetTemp;//外部温度测量值：有符号数（22222为温湿度传感器故障）
     private int leftDoorheat;//边柜门加热状态：0=关1=开
-    private int leftHumidity;//湿度测量值：100以内代表百分比
+    private int leftHumidity;//湿度测量值：100以内代表百分比（22222为温湿度传感器故障）
     private int leftLight;//照明灯状态：0=关1=开
     private int leftPushGoodsRaster;//下货光栅状态：0=正常1=故障
     private int leftOutGoodsRaster;//X轴出货光栅状态：0=正常1=故障
@@ -35,9 +35,9 @@ public class MachineState {
     private int rightCompressorTemp;//压缩机温度：有符号数（22222为故障）
     private int rightCompressorDCfanState;//压缩机直流风扇状态：0=未启动1=正常2=异常
     private int rightCabinetDCfanState;//边柜直流风扇状态：0=未启动1=正常2=异常
-    private int rightDoor;//门开关状态：1=关门0=开门
+    private int rightOutCabinetTemp;//外部温度测量值：有符号数（22222为温湿度传感器故障）
     private int rightDoorheat;//边柜门加热状态：0=关1=开
-    private int rightHumidity;//湿度测量值：100以内代表百分比
+    private int rightHumidity;//湿度测量值：100以内代表百分比（22222为温湿度传感器故障）
     private int rightLight;//照明灯状态：0=关1=开
     private int rightPushGoodsRaster;//下货光栅状态：0=正常1=故障
     private int rightOutGoodsRaster;//X轴出货光栅状态：0=正常1=故障
@@ -61,10 +61,53 @@ public class MachineState {
     private int[] rightFlootPosition;//每一层的位置
     private int rightFlootNo;//层数
 
+    //更新单片机通讯协议后新加的字段
+    private int leftTempControlAlternatPower;//温控交流总电源状态（0=断开，1=接通）
+    private int leftRefrigerationCompressorState;//制冷压缩机工作状态（0=停止，1=运转）
+    private int leftCompressorFanState;//压缩机风扇工作状态（0=停止，1=运转）
+    private int leftHeatingWireState;//制热电热丝工作状态（0=断开，1=接通）
+    private int leftRecirculatAirFanState;//循环风风扇工作状态（0=停止，1=运转）
+
+    private int leftLiftPlatformDownSwitch;//升降台下止点开关即时状态（0=开，1=合）
+    private int leftLiftPlatformUpSwitch;//升降台上止点开关即时状态（0=开，1=合）
+    private int leftLiftPlatformOutGoodsSwitch;//升降台出货口开关即时状态（0=开，1=合）
+    private int leftOutGoodsRasterImmediately;//出货光栅传感器即时状态（0=透光，1=遮光）
+    private int leftPushGoodsRasterImmediately;//下货光栅即时状态（0=透光，1=遮光）
+    private int leftMotorFeedbackState1;//电机1反馈状态（0=凸台位，1=缺口位）
+    private int leftMotorFeedbackState2;//电机2反馈状态（0=凸台位，1=缺口位）
+    private int leftOutGoodsDoorDownSwitch;//出货门下止点开关即时状态（0=开，1=合）
+    private int leftOutGoodsDoorUpSwitch;//出货门上止点开关即时状态（0=开，1=合）
+
+    private int rightTempControlAlternatPower;//温控交流总电源状态（0=断开，1=接通）
+    private int rightRefrigerationCompressorState;//制冷压缩机工作状态（0=停止，1=运转）
+    private int rightCompressorFanState;//压缩机风扇工作状态（0=停止，1=运转）
+    private int rightHeatingWireState;//制热电热丝工作状态（0=断开，1=接通）
+    private int rightRecirculatAirFanState;//循环风风扇工作状态（0=停止，1=运转）
+
+    private int rightLiftPlatformDownSwitch;//升降台下止点开关即时状态（0=开，1=合）
+    private int rightLiftPlatformUpSwitch;//升降台上止点开关即时状态（0=开，1=合）
+    private int rightLiftPlatformOutGoodsSwitch;//升降台出货口开关即时状态（0=开，1=合）
+    private int rightOutGoodsRasterImmediately;//出货光栅传感器即时状态（0=透光，1=遮光）
+    private int rightPushGoodsRasterImmediately;//下货光栅即时状态（0=透光，1=遮光）
+    private int rightMotorFeedbackState1;//电机1反馈状态（0=凸台位，1=缺口位）
+    private int rightMotorFeedbackState2;//电机2反馈状态（0=凸台位，1=缺口位）
+    private int rightOutGoodsDoorDownSwitch;//出货门下止点开关即时状态（0=开，1=合）
+    private int rightOutGoodsDoorUpSwitch;//出货门上止点开关即时状态（0=开，1=合）
+
+
+    private int midGetDoorWaitClose;//取货门待关门标志（0=正常，1=待关门）
+    private int midGetDoorDownSwitch;//取货门下止点开关即时状态（0=开，1=合）
+    private int midGetDoorUpSwitch;//取货门上止点开关即时状态（0=开，1=合）
+    private int midDropDoorDownSwitch;//落货门下止点开关即时状态（0=开，1=合）
+    private int midDropDoorUpSwitch;//落货门上止点开关即时状态（0=开，1=合）
+
+
+    private int electricQuantity;//机器用电量，保存值为扩大一百倍
+
     public MachineState() {
     }
 
-    public MachineState(int _id, String machineID, String version, int vmState, int leftState, int rightState, int leftTempState, int leftSetTemp, int leftCabinetTemp, int leftCabinetTopTemp, int leftCompressorTemp, int leftCompressorDCfanState, int leftCabinetDCfanState, int leftDoor, int leftDoorheat, int leftHumidity, int leftLight, int leftPushGoodsRaster, int leftOutGoodsRaster, int leftOutGoodsDoor, int rightTempState, int rightSetTemp, int rightCabinetTemp, int rightCabinetTopTemp, int rightCompressorTemp, int rightCompressorDCfanState, int rightCabinetDCfanState, int rightDoor, int rightDoorheat, int rightHumidity, int rightLight, int rightPushGoodsRaster, int rightOutGoodsRaster, int rightOutGoodsDoor, int midLight, int midDoorLock, int midDoor, int midGetGoodsRaster, int midDropGoodsRaster, int midAntiPinchHandRaster, int midGetDoor, int midDropDoor, int leftOutPosition, int[] leftFlootPosition, int leftFlootNo, int rightOutPosition, int[] rightFlootPosition, int rightFlootNo) {
+    public MachineState(int _id, String machineID, String version, int vmState, int leftState, int rightState, int leftTempState, int leftSetTemp, int leftCabinetTemp, int leftCabinetTopTemp, int leftCompressorTemp, int leftCompressorDCfanState, int leftCabinetDCfanState, int leftOutCabinetTemp, int leftDoorheat, int leftHumidity, int leftLight, int leftPushGoodsRaster, int leftOutGoodsRaster, int leftOutGoodsDoor, int rightTempState, int rightSetTemp, int rightCabinetTemp, int rightCabinetTopTemp, int rightCompressorTemp, int rightCompressorDCfanState, int rightCabinetDCfanState, int rightOutCabinetTemp, int rightDoorheat, int rightHumidity, int rightLight, int rightPushGoodsRaster, int rightOutGoodsRaster, int rightOutGoodsDoor, int midLight, int midDoorLock, int midDoor, int midGetGoodsRaster, int midDropGoodsRaster, int midAntiPinchHandRaster, int midGetDoor, int midDropDoor, int leftOutPosition, int[] leftFlootPosition, int leftFlootNo, int rightOutPosition, int[] rightFlootPosition, int rightFlootNo, int leftTempControlAlternatPower, int leftRefrigerationCompressorState, int leftCompressorFanState, int leftHeatingWireState, int leftRecirculatAirFanState, int leftLiftPlatformDownSwitch, int leftLiftPlatformUpSwitch, int leftLiftPlatformOutGoodsSwitch, int leftOutGoodsRasterImmediately, int leftPushGoodsRasterImmediately, int leftMotorFeedbackState1, int leftMotorFeedbackState2, int leftOutGoodsDoorDownSwitch, int leftOutGoodsDoorUpSwitch, int rightTempControlAlternatPower, int rightRefrigerationCompressorState, int rightCompressorFanState, int rightHeatingWireState, int rightRecirculatAirFanState, int rightLiftPlatformDownSwitch, int rightLiftPlatformUpSwitch, int rightLiftPlatformOutGoodsSwitch, int rightOutGoodsRasterImmediately, int rightPushGoodsRasterImmediately, int rightMotorFeedbackState1, int rightMotorFeedbackState2, int rightOutGoodsDoorDownSwitch, int rightOutGoodsDoorUpSwitch, int midGetDoorWaitClose, int midGetDoorDownSwitch, int midGetDoorUpSwitch, int midDropDoorDownSwitch, int midDropDoorUpSwitch, int electricQuantity) {
         this._id = _id;
         this.machineID = machineID;
         this.version = version;
@@ -78,7 +121,7 @@ public class MachineState {
         this.leftCompressorTemp = leftCompressorTemp;
         this.leftCompressorDCfanState = leftCompressorDCfanState;
         this.leftCabinetDCfanState = leftCabinetDCfanState;
-        this.leftDoor = leftDoor;
+        this.leftOutCabinetTemp = leftOutCabinetTemp;
         this.leftDoorheat = leftDoorheat;
         this.leftHumidity = leftHumidity;
         this.leftLight = leftLight;
@@ -92,7 +135,7 @@ public class MachineState {
         this.rightCompressorTemp = rightCompressorTemp;
         this.rightCompressorDCfanState = rightCompressorDCfanState;
         this.rightCabinetDCfanState = rightCabinetDCfanState;
-        this.rightDoor = rightDoor;
+        this.rightOutCabinetTemp = rightOutCabinetTemp;
         this.rightDoorheat = rightDoorheat;
         this.rightHumidity = rightHumidity;
         this.rightLight = rightLight;
@@ -113,8 +156,41 @@ public class MachineState {
         this.rightOutPosition = rightOutPosition;
         this.rightFlootPosition = rightFlootPosition;
         this.rightFlootNo = rightFlootNo;
+        this.leftTempControlAlternatPower = leftTempControlAlternatPower;
+        this.leftRefrigerationCompressorState = leftRefrigerationCompressorState;
+        this.leftCompressorFanState = leftCompressorFanState;
+        this.leftHeatingWireState = leftHeatingWireState;
+        this.leftRecirculatAirFanState = leftRecirculatAirFanState;
+        this.leftLiftPlatformDownSwitch = leftLiftPlatformDownSwitch;
+        this.leftLiftPlatformUpSwitch = leftLiftPlatformUpSwitch;
+        this.leftLiftPlatformOutGoodsSwitch = leftLiftPlatformOutGoodsSwitch;
+        this.leftOutGoodsRasterImmediately = leftOutGoodsRasterImmediately;
+        this.leftPushGoodsRasterImmediately = leftPushGoodsRasterImmediately;
+        this.leftMotorFeedbackState1 = leftMotorFeedbackState1;
+        this.leftMotorFeedbackState2 = leftMotorFeedbackState2;
+        this.leftOutGoodsDoorDownSwitch = leftOutGoodsDoorDownSwitch;
+        this.leftOutGoodsDoorUpSwitch = leftOutGoodsDoorUpSwitch;
+        this.rightTempControlAlternatPower = rightTempControlAlternatPower;
+        this.rightRefrigerationCompressorState = rightRefrigerationCompressorState;
+        this.rightCompressorFanState = rightCompressorFanState;
+        this.rightHeatingWireState = rightHeatingWireState;
+        this.rightRecirculatAirFanState = rightRecirculatAirFanState;
+        this.rightLiftPlatformDownSwitch = rightLiftPlatformDownSwitch;
+        this.rightLiftPlatformUpSwitch = rightLiftPlatformUpSwitch;
+        this.rightLiftPlatformOutGoodsSwitch = rightLiftPlatformOutGoodsSwitch;
+        this.rightOutGoodsRasterImmediately = rightOutGoodsRasterImmediately;
+        this.rightPushGoodsRasterImmediately = rightPushGoodsRasterImmediately;
+        this.rightMotorFeedbackState1 = rightMotorFeedbackState1;
+        this.rightMotorFeedbackState2 = rightMotorFeedbackState2;
+        this.rightOutGoodsDoorDownSwitch = rightOutGoodsDoorDownSwitch;
+        this.rightOutGoodsDoorUpSwitch = rightOutGoodsDoorUpSwitch;
+        this.midGetDoorWaitClose = midGetDoorWaitClose;
+        this.midGetDoorDownSwitch = midGetDoorDownSwitch;
+        this.midGetDoorUpSwitch = midGetDoorUpSwitch;
+        this.midDropDoorDownSwitch = midDropDoorDownSwitch;
+        this.midDropDoorUpSwitch = midDropDoorUpSwitch;
+        this.electricQuantity = electricQuantity;
     }
-
 
     public int get_id() {
         return _id;
@@ -220,12 +296,12 @@ public class MachineState {
         this.leftCabinetDCfanState = leftCabinetDCfanState;
     }
 
-    public int getLeftDoor() {
-        return leftDoor;
+    public int getLeftOutCabinetTemp() {
+        return leftOutCabinetTemp;
     }
 
-    public void setLeftDoor(int leftDoor) {
-        this.leftDoor = leftDoor;
+    public void setLeftOutCabinetTemp(int leftOutCabinetTemp) {
+        this.leftOutCabinetTemp = leftOutCabinetTemp;
     }
 
     public int getLeftDoorheat() {
@@ -332,12 +408,12 @@ public class MachineState {
         this.rightCabinetDCfanState = rightCabinetDCfanState;
     }
 
-    public int getRightDoor() {
-        return rightDoor;
+    public int getRightOutCabinetTemp() {
+        return rightOutCabinetTemp;
     }
 
-    public void setRightDoor(int rightDoor) {
-        this.rightDoor = rightDoor;
+    public void setRightOutCabinetTemp(int rightOutCabinetTemp) {
+        this.rightOutCabinetTemp = rightOutCabinetTemp;
     }
 
     public int getRightDoorheat() {
@@ -463,7 +539,6 @@ public class MachineState {
     public int getLeftFlootPosition(int floor) {
         return leftFlootPosition[floor];
     }
-
     public void setLeftFlootPosition(String str) {
         if (str.equals("")) return;
         String[] strs = str.split(" ");
@@ -510,6 +585,278 @@ public class MachineState {
         this.rightFlootNo = rightFlootNo;
     }
 
+    public int getLeftTempControlAlternatPower() {
+        return leftTempControlAlternatPower;
+    }
+
+    public void setLeftTempControlAlternatPower(int leftTempControlAlternatPower) {
+        this.leftTempControlAlternatPower = leftTempControlAlternatPower;
+    }
+
+    public int getLeftRefrigerationCompressorState() {
+        return leftRefrigerationCompressorState;
+    }
+
+    public void setLeftRefrigerationCompressorState(int leftRefrigerationCompressorState) {
+        this.leftRefrigerationCompressorState = leftRefrigerationCompressorState;
+    }
+
+    public int getLeftCompressorFanState() {
+        return leftCompressorFanState;
+    }
+
+    public void setLeftCompressorFanState(int leftCompressorFanState) {
+        this.leftCompressorFanState = leftCompressorFanState;
+    }
+
+    public int getLeftHeatingWireState() {
+        return leftHeatingWireState;
+    }
+
+    public void setLeftHeatingWireState(int leftHeatingWireState) {
+        this.leftHeatingWireState = leftHeatingWireState;
+    }
+
+    public int getLeftRecirculatAirFanState() {
+        return leftRecirculatAirFanState;
+    }
+
+    public void setLeftRecirculatAirFanState(int leftRecirculatAirFanState) {
+        this.leftRecirculatAirFanState = leftRecirculatAirFanState;
+    }
+
+    public int getLeftLiftPlatformDownSwitch() {
+        return leftLiftPlatformDownSwitch;
+    }
+
+    public void setLeftLiftPlatformDownSwitch(int leftLiftPlatformDownSwitch) {
+        this.leftLiftPlatformDownSwitch = leftLiftPlatformDownSwitch;
+    }
+
+    public int getLeftLiftPlatformUpSwitch() {
+        return leftLiftPlatformUpSwitch;
+    }
+
+    public void setLeftLiftPlatformUpSwitch(int leftLiftPlatformUpSwitch) {
+        this.leftLiftPlatformUpSwitch = leftLiftPlatformUpSwitch;
+    }
+
+    public int getLeftLiftPlatformOutGoodsSwitch() {
+        return leftLiftPlatformOutGoodsSwitch;
+    }
+
+    public void setLeftLiftPlatformOutGoodsSwitch(int leftLiftPlatformOutGoodsSwitch) {
+        this.leftLiftPlatformOutGoodsSwitch = leftLiftPlatformOutGoodsSwitch;
+    }
+
+    public int getLeftOutGoodsRasterImmediately() {
+        return leftOutGoodsRasterImmediately;
+    }
+
+    public void setLeftOutGoodsRasterImmediately(int leftOutGoodsRasterImmediately) {
+        this.leftOutGoodsRasterImmediately = leftOutGoodsRasterImmediately;
+    }
+
+    public int getLeftPushGoodsRasterImmediately() {
+        return leftPushGoodsRasterImmediately;
+    }
+
+    public void setLeftPushGoodsRasterImmediately(int leftPushGoodsRasterImmediately) {
+        this.leftPushGoodsRasterImmediately = leftPushGoodsRasterImmediately;
+    }
+
+    public int getLeftMotorFeedbackState1() {
+        return leftMotorFeedbackState1;
+    }
+
+    public void setLeftMotorFeedbackState1(int leftMotorFeedbackState1) {
+        this.leftMotorFeedbackState1 = leftMotorFeedbackState1;
+    }
+
+    public int getLeftMotorFeedbackState2() {
+        return leftMotorFeedbackState2;
+    }
+
+    public void setLeftMotorFeedbackState2(int leftMotorFeedbackState2) {
+        this.leftMotorFeedbackState2 = leftMotorFeedbackState2;
+    }
+
+    public int getLeftOutGoodsDoorDownSwitch() {
+        return leftOutGoodsDoorDownSwitch;
+    }
+
+    public void setLeftOutGoodsDoorDownSwitch(int leftOutGoodsDoorDownSwitch) {
+        this.leftOutGoodsDoorDownSwitch = leftOutGoodsDoorDownSwitch;
+    }
+
+    public int getLeftOutGoodsDoorUpSwitch() {
+        return leftOutGoodsDoorUpSwitch;
+    }
+
+    public void setLeftOutGoodsDoorUpSwitch(int leftOutGoodsDoorUpSwitch) {
+        this.leftOutGoodsDoorUpSwitch = leftOutGoodsDoorUpSwitch;
+    }
+
+    public int getRightTempControlAlternatPower() {
+        return rightTempControlAlternatPower;
+    }
+
+    public void setRightTempControlAlternatPower(int rightTempControlAlternatPower) {
+        this.rightTempControlAlternatPower = rightTempControlAlternatPower;
+    }
+
+    public int getRightRefrigerationCompressorState() {
+        return rightRefrigerationCompressorState;
+    }
+
+    public void setRightRefrigerationCompressorState(int rightRefrigerationCompressorState) {
+        this.rightRefrigerationCompressorState = rightRefrigerationCompressorState;
+    }
+
+    public int getRightCompressorFanState() {
+        return rightCompressorFanState;
+    }
+
+    public void setRightCompressorFanState(int rightCompressorFanState) {
+        this.rightCompressorFanState = rightCompressorFanState;
+    }
+
+    public int getRightHeatingWireState() {
+        return rightHeatingWireState;
+    }
+
+    public void setRightHeatingWireState(int rightHeatingWireState) {
+        this.rightHeatingWireState = rightHeatingWireState;
+    }
+
+    public int getRightRecirculatAirFanState() {
+        return rightRecirculatAirFanState;
+    }
+
+    public void setRightRecirculatAirFanState(int rightRecirculatAirFanState) {
+        this.rightRecirculatAirFanState = rightRecirculatAirFanState;
+    }
+
+    public int getRightLiftPlatformDownSwitch() {
+        return rightLiftPlatformDownSwitch;
+    }
+
+    public void setRightLiftPlatformDownSwitch(int rightLiftPlatformDownSwitch) {
+        this.rightLiftPlatformDownSwitch = rightLiftPlatformDownSwitch;
+    }
+
+    public int getRightLiftPlatformUpSwitch() {
+        return rightLiftPlatformUpSwitch;
+    }
+
+    public void setRightLiftPlatformUpSwitch(int rightLiftPlatformUpSwitch) {
+        this.rightLiftPlatformUpSwitch = rightLiftPlatformUpSwitch;
+    }
+
+    public int getRightLiftPlatformOutGoodsSwitch() {
+        return rightLiftPlatformOutGoodsSwitch;
+    }
+
+    public void setRightLiftPlatformOutGoodsSwitch(int rightLiftPlatformOutGoodsSwitch) {
+        this.rightLiftPlatformOutGoodsSwitch = rightLiftPlatformOutGoodsSwitch;
+    }
+
+    public int getRightOutGoodsRasterImmediately() {
+        return rightOutGoodsRasterImmediately;
+    }
+
+    public void setRightOutGoodsRasterImmediately(int rightOutGoodsRasterImmediately) {
+        this.rightOutGoodsRasterImmediately = rightOutGoodsRasterImmediately;
+    }
+
+    public int getRightPushGoodsRasterImmediately() {
+        return rightPushGoodsRasterImmediately;
+    }
+
+    public void setRightPushGoodsRasterImmediately(int rightPushGoodsRasterImmediately) {
+        this.rightPushGoodsRasterImmediately = rightPushGoodsRasterImmediately;
+    }
+
+    public int getRightMotorFeedbackState1() {
+        return rightMotorFeedbackState1;
+    }
+
+    public void setRightMotorFeedbackState1(int rightMotorFeedbackState1) {
+        this.rightMotorFeedbackState1 = rightMotorFeedbackState1;
+    }
+
+    public int getRightMotorFeedbackState2() {
+        return rightMotorFeedbackState2;
+    }
+
+    public void setRightMotorFeedbackState2(int rightMotorFeedbackState2) {
+        this.rightMotorFeedbackState2 = rightMotorFeedbackState2;
+    }
+
+    public int getRightOutGoodsDoorDownSwitch() {
+        return rightOutGoodsDoorDownSwitch;
+    }
+
+    public void setRightOutGoodsDoorDownSwitch(int rightOutGoodsDoorDownSwitch) {
+        this.rightOutGoodsDoorDownSwitch = rightOutGoodsDoorDownSwitch;
+    }
+
+    public int getRightOutGoodsDoorUpSwitch() {
+        return rightOutGoodsDoorUpSwitch;
+    }
+
+    public void setRightOutGoodsDoorUpSwitch(int rightOutGoodsDoorUpSwitch) {
+        this.rightOutGoodsDoorUpSwitch = rightOutGoodsDoorUpSwitch;
+    }
+
+    public int getMidGetDoorWaitClose() {
+        return midGetDoorWaitClose;
+    }
+
+    public void setMidGetDoorWaitClose(int midGetDoorWaitClose) {
+        this.midGetDoorWaitClose = midGetDoorWaitClose;
+    }
+
+    public int getMidGetDoorDownSwitch() {
+        return midGetDoorDownSwitch;
+    }
+
+    public void setMidGetDoorDownSwitch(int midGetDoorDownSwitch) {
+        this.midGetDoorDownSwitch = midGetDoorDownSwitch;
+    }
+
+    public int getMidGetDoorUpSwitch() {
+        return midGetDoorUpSwitch;
+    }
+
+    public void setMidGetDoorUpSwitch(int midGetDoorUpSwitch) {
+        this.midGetDoorUpSwitch = midGetDoorUpSwitch;
+    }
+
+    public int getMidDropDoorDownSwitch() {
+        return midDropDoorDownSwitch;
+    }
+
+    public void setMidDropDoorDownSwitch(int midDropDoorDownSwitch) {
+        this.midDropDoorDownSwitch = midDropDoorDownSwitch;
+    }
+
+    public int getMidDropDoorUpSwitch() {
+        return midDropDoorUpSwitch;
+    }
+
+    public void setMidDropDoorUpSwitch(int midDropDoorUpSwitch) {
+        this.midDropDoorUpSwitch = midDropDoorUpSwitch;
+    }
+
+    public int getElectricQuantity() {
+        return electricQuantity;
+    }
+
+    public void setElectricQuantity(int electricQuantity) {
+        this.electricQuantity = electricQuantity;
+    }
+
     @Override
     public String toString() {
         return "MachineState{" +
@@ -526,7 +873,7 @@ public class MachineState {
                 ", leftCompressorTemp=" + leftCompressorTemp +
                 ", leftCompressorDCfanState=" + leftCompressorDCfanState +
                 ", leftCabinetDCfanState=" + leftCabinetDCfanState +
-                ", leftDoor=" + leftDoor +
+                ", leftOutCabinetTemp=" + leftOutCabinetTemp +
                 ", leftDoorheat=" + leftDoorheat +
                 ", leftHumidity=" + leftHumidity +
                 ", leftLight=" + leftLight +
@@ -540,7 +887,7 @@ public class MachineState {
                 ", rightCompressorTemp=" + rightCompressorTemp +
                 ", rightCompressorDCfanState=" + rightCompressorDCfanState +
                 ", rightCabinetDCfanState=" + rightCabinetDCfanState +
-                ", rightDoor=" + rightDoor +
+                ", rightOutCabinetTemp=" + rightOutCabinetTemp +
                 ", rightDoorheat=" + rightDoorheat +
                 ", rightHumidity=" + rightHumidity +
                 ", rightLight=" + rightLight +
@@ -561,6 +908,40 @@ public class MachineState {
                 ", rightOutPosition=" + rightOutPosition +
                 ", rightFlootPosition=" + Arrays.toString(rightFlootPosition) +
                 ", rightFlootNo=" + rightFlootNo +
+                ", leftTempControlAlternatPower=" + leftTempControlAlternatPower +
+                ", leftRefrigerationCompressorState=" + leftRefrigerationCompressorState +
+                ", leftCompressorFanState=" + leftCompressorFanState +
+                ", leftHeatingWireState=" + leftHeatingWireState +
+                ", leftRecirculatAirFanState=" + leftRecirculatAirFanState +
+                ", leftLiftPlatformDownSwitch=" + leftLiftPlatformDownSwitch +
+                ", leftLiftPlatformUpSwitch=" + leftLiftPlatformUpSwitch +
+                ", leftLiftPlatformOutGoodsSwitch=" + leftLiftPlatformOutGoodsSwitch +
+                ", leftOutGoodsRasterImmediately=" + leftOutGoodsRasterImmediately +
+                ", leftPushGoodsRasterImmediately=" + leftPushGoodsRasterImmediately +
+                ", leftMotorFeedbackState1=" + leftMotorFeedbackState1 +
+                ", leftMotorFeedbackState2=" + leftMotorFeedbackState2 +
+                ", leftOutGoodsDoorDownSwitch=" + leftOutGoodsDoorDownSwitch +
+                ", leftOutGoodsDoorUpSwitch=" + leftOutGoodsDoorUpSwitch +
+                ", rightTempControlAlternatPower=" + rightTempControlAlternatPower +
+                ", rightRefrigerationCompressorState=" + rightRefrigerationCompressorState +
+                ", rightCompressorFanState=" + rightCompressorFanState +
+                ", rightHeatingWireState=" + rightHeatingWireState +
+                ", rightRecirculatAirFanState=" + rightRecirculatAirFanState +
+                ", rightLiftPlatformDownSwitch=" + rightLiftPlatformDownSwitch +
+                ", rightLiftPlatformUpSwitch=" + rightLiftPlatformUpSwitch +
+                ", rightLiftPlatformOutGoodsSwitch=" + rightLiftPlatformOutGoodsSwitch +
+                ", rightOutGoodsRasterImmediately=" + rightOutGoodsRasterImmediately +
+                ", rightPushGoodsRasterImmediately=" + rightPushGoodsRasterImmediately +
+                ", rightMotorFeedbackState1=" + rightMotorFeedbackState1 +
+                ", rightMotorFeedbackState2=" + rightMotorFeedbackState2 +
+                ", rightOutGoodsDoorDownSwitch=" + rightOutGoodsDoorDownSwitch +
+                ", rightOutGoodsDoorUpSwitch=" + rightOutGoodsDoorUpSwitch +
+                ", midGetDoorWaitClose=" + midGetDoorWaitClose +
+                ", midGetDoorDownSwitch=" + midGetDoorDownSwitch +
+                ", midGetDoorUpSwitch=" + midGetDoorUpSwitch +
+                ", midDropDoorDownSwitch=" + midDropDoorDownSwitch +
+                ", midDropDoorUpSwitch=" + midDropDoorUpSwitch +
+                ", electricQuantity=" + electricQuantity +
                 '}';
     }
 }

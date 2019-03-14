@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.njust.major.bean.MachineState;
 import com.njust.major.bean.Transaction;
 import com.njust.major.dao.MachineStateDao;
 import com.njust.major.dao.TransactionDao;
@@ -26,6 +27,7 @@ import static com.njust.VMApplication.mUpdataDatabaseFlag;
 public class VMService extends Service {
 
     private TransactionDao tDao;
+    private VMMainThread mainThread;
 
     @Override
     public void onCreate(){
@@ -46,6 +48,9 @@ public class VMService extends Service {
         mQuery2Flag = true;
         mQuery0Flag = true;
         mUpdataDatabaseFlag = true;
+        mainThread = new VMMainThread(getApplicationContext());
+        mainThread.initMainThread();
+        mainThread.start();
     }
 
     @Override
@@ -54,8 +59,7 @@ public class VMService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Nullable
